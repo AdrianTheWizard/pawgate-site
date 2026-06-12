@@ -19,20 +19,19 @@
   <ul class="nav-links">
     <li><a href="#features">Funksjoner</a></li>
     <li><a href="#hardware">Hardware</a></li>
-    <li><a href="#pricing">Prisar</a></li>
-    <li><a href="#download">Last ned</a></li>
+    <li><a href="#pricing">Priser</a></li>
   </ul>
   <div class="nav-cta">
     <button class="btn btn-ghost theme-toggle" onclick="toggleTheme()" title="Bytt tema" aria-label="Bytt mellom lyst og mørkt tema">
       <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
     </button>
-    <a href="#download" class="btn btn-ghost">Last ned</a>
-    <button class="btn btn-ghost" onclick="openAuth()">Logg inn</button>
     <button class="btn btn-primary" onclick="openDownloadModal()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Hent appen
     </button>
+    <button class="btn btn-ghost" id="nav-login" onclick="openAuth()">Logg inn</button>
+    <button class="nav-avatar" id="nav-avatar" onclick="openProfile()" style="display:none" title="Min profil"></button>
   </div>
 </nav>
 
@@ -567,6 +566,41 @@
     <button class="btn btn-primary" onclick="doAdminLogin()" style="width:100%;justify-content:center">Logg inn som admin</button>
     <div class="auth-note"><span class="auth-link" style="color:var(--muted)" onclick="swTab('login')">← Tilbake</span></div>
    </div>
+  </div>
+ </div>
+</div>
+
+<!-- ══ PROFILE OVERLAY ══ -->
+<div class="overlay" id="profile-ov" onclick="if(event.target===this)closeOv('profile-ov')">
+ <div class="omodal" style="max-width:460px">
+  <div class="mhdr">
+   <div style="display:flex;align-items:center;gap:14px">
+    <div class="profile-avatar-big" id="profile-av-big"></div>
+    <div><div class="mtitle" id="profile-title">Min profil</div><div class="msub" id="profile-email-sub"></div></div>
+   </div>
+   <button class="mclose" onclick="closeOv('profile-ov')">✕</button>
+  </div>
+  <div class="mbody" style="max-height:72vh;overflow-y:auto;gap:0;padding:20px 28px 28px">
+
+   <div class="profile-section-lbl">Personalia</div>
+   <div class="field" style="margin-bottom:12px"><label>Fullt navn</label><input type="text" class="inp" id="p-name" placeholder="Ditt fulle navn"></div>
+   <div class="field" style="margin-bottom:12px"><label>Sted / by</label><input type="text" class="inp" id="p-location" placeholder="f.eks. Bergen"></div>
+   <div class="field" style="margin-bottom:16px"><label>Telefonnummer</label><input type="tel" class="inp" id="p-phone" placeholder="+47 000 00 000"></div>
+   <button class="btn btn-primary" onclick="saveProfile()" style="width:100%;justify-content:center;margin-bottom:24px">Lagre endringer</button>
+
+   <div class="profile-divider"></div>
+   <div class="profile-section-lbl">Endre e-post</div>
+   <div class="field" style="margin-bottom:16px"><label>Ny e-post</label><input type="email" class="inp" id="p-email" placeholder="ny@epost.no"></div>
+   <button class="btn btn-ghost" onclick="updateProfileEmail()" style="width:100%;justify-content:center;margin-bottom:24px">Oppdater e-post</button>
+
+   <div class="profile-divider"></div>
+   <div class="profile-section-lbl">Endre passord</div>
+   <div class="field" style="margin-bottom:12px"><label>Nytt passord</label><input type="password" class="inp" id="p-pass" placeholder="Minst 8 tegn"></div>
+   <div class="field" style="margin-bottom:16px"><label>Bekreft passord</label><input type="password" class="inp" id="p-pass2" placeholder="Gjenta passordet"></div>
+   <button class="btn btn-ghost" onclick="updateProfilePassword()" style="width:100%;justify-content:center;margin-bottom:24px">Oppdater passord</button>
+
+   <div class="profile-divider"></div>
+   <button class="btn" onclick="doLogout()" style="width:100%;justify-content:center;background:rgba(184,90,74,.08);border:1px solid rgba(184,90,74,.25);color:#e07060">Logg ut</button>
   </div>
  </div>
 </div>

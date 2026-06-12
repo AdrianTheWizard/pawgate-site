@@ -65,6 +65,87 @@ let featData = [
   {title:'Oppgavekalender', body:'Planlegg og fordel daglig arbeid — vaksinering, veterinærtime, rengjøring og alt annet. Med egne kategorier og farger.'},
 ];
 
+// ═══ Auth state & nav ═══
+function getInitials(name) {
+  if(!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  if(parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+}
+
+function updateNavAuth(user) {
+  const loginBtn = document.getElementById('nav-login');
+  const avatarBtn = document.getElementById('nav-avatar');
+  if(!loginBtn || !avatarBtn) return;
+  if(user) {
+    const name = user.user_metadata?.name || user.email;
+    const initials = getInitials(name);
+    loginBtn.style.display = 'none';
+    avatarBtn.style.display = 'flex';
+    avatarBtn.textContent = initials;
+  } else {
+    loginBtn.style.display = '';
+    avatarBtn.style.display = 'none';
+  }
+}
+
+async function openProfile() {
+  const { data: { user } } = await _sb.auth.getUser();
+  if(!user) return;
+  const meta = user.user_metadata || {};
+  document.getElementById('profile-title').textContent = meta.name || 'Min profil';
+  document.getElementById('profile-email-sub').textContent = user.email;
+  document.getElementById('profile-av-big').textContent = getInitials(meta.name || user.email);
+  document.getElementById('p-name').value = meta.name || '';
+  document.getElementById('p-location').value = meta.location || '';
+  document.getElementById('p-phone').value = meta.phone || '';
+  document.getElementById('p-email').value = user.email;
+  document.getElementById('p-pass').value = '';
+  document.getElementById('p-pass2').value = '';
+  openOv('profile-ov');
+}
+
+async function saveProfile() {
+  const name = document.getElementById('p-name').value.trim();
+  const location = document.getElementById('p-location').value.trim();
+  const phone = document.getElementById('p-phone').value.trim();
+  const { data, error } = await _sb.auth.updateUser({ data: { name, location, phone } });
+  if(error) { alert('Kunne ikke lagre. Prøv igjen.'); return; }
+  updateNavAuth(data.user);
+  document.getElementById('profile-title').textContent = name || 'Min profil';
+  document.getElementById('profile-av-big').textContent = getInitials(name || data.user.email);
+  showOk('Lagret!', 'Profilen din er oppdatert.', '✅');
+  closeOv('profile-ov');
+}
+
+async function updateProfileEmail() {
+  const email = document.getElementById('p-email').value.trim();
+  if(!email) { alert('Skriv inn ny e-post.'); return; }
+  const { error } = await _sb.auth.updateUser({ email });
+  if(error) { alert('Kunne ikke oppdatere e-post. Prøv igjen.'); return; }
+  showOk('Bekreft ny e-post', 'Vi har sendt en bekreftelseslenke til den nye e-postadressen din.', '📧');
+  closeOv('profile-ov');
+}
+
+async function updateProfilePassword() {
+  const p = document.getElementById('p-pass').value;
+  const p2 = document.getElementById('p-pass2').value;
+  if(!p || !p2) { alert('Fyll ut begge passordfelter.'); return; }
+  if(p !== p2) { alert('Passordene stemmer ikke overens.'); return; }
+  if(p.length < 8) { alert('Passordet må være minst 8 tegn.'); return; }
+  const { error } = await _sb.auth.updateUser({ password: p });
+  if(error) { alert('Kunne ikke oppdatere passord. Prøv igjen.'); return; }
+  showOk('Passord oppdatert!', 'Ditt nye passord er aktivt.', '✅');
+  closeOv('profile-ov');
+}
+
+async function doLogout() {
+  await _sb.auth.signOut();
+  updateNavAuth(null);
+  closeOv('profile-ov');
+  showOk('Logget ut', 'Du er nå logget ut av PawGate.', '👋');
+}
+
 // ═══ Overlay utils ═══
 function openOv(id){ document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeOv(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
@@ -89,10 +170,12 @@ async function doLogin(){
   const e=document.getElementById('l-email').value.trim();
   const p=document.getElementById('l-pass').value;
   if(!e||!p){ alert('Fyll ut alle feltene'); return; }
-  const { error } = await _sb.auth.signInWithPassword({ email: e, password: p });
+  const { data, error } = await _sb.auth.signInWithPassword({ email: e, password: p });
   if(error){ alert('Feil e-post eller passord. Prøv igjen.'); return; }
+  updateNavAuth(data.user);
+  const name = data.user.user_metadata?.name || e;
   closeOv('auth-ov');
-  showOk('Innlogget!',`Velkommen tilbake, ${e}`,'👋');
+  showOk('Innlogget!', `Velkommen tilbake, ${name.split(' ')[0]}!`, '👋');
 }
 
 async function doReg(){
@@ -115,7 +198,7 @@ async function doReg(){
   try { await sbSaveUser(u); users.push(u); } catch(err){ console.error(err); }
   sendWelcomeEmail(n, e);
   closeOv('auth-ov');
-  showOk('Registrert!','Sjekk e-posten din for en bekreftelse fra PawGate.','🎉');
+  showOk('Registrert! 🐾','Vi har sendt deg en velkomst-e-post fra PawGate. Sjekk innboksen din — og husk å se i søppelpost/spam om du ikke finner den.','🎉');
   updateStats();
 }
 
@@ -343,10 +426,16 @@ function toggleTheme(){
 }
 
 (function handleAuthRedirect(){
-  _sb.auth.onAuthStateChange((event) => {
+  _sb.auth.onAuthStateChange((event, session) => {
     if(event === 'PASSWORD_RECOVERY'){
       document.getElementById('reset-ov').classList.add('open');
       document.body.style.overflow = 'hidden';
+    }
+    if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION'){
+      updateNavAuth(session?.user || null);
+    }
+    if(event === 'SIGNED_OUT'){
+      updateNavAuth(null);
     }
   });
 })();
