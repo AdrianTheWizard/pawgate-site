@@ -536,7 +536,6 @@
     <button class="btn btn-primary" onclick="doLogin()" style="width:100%;justify-content:center">Logg inn</button>
     <div class="auth-note">Ingen konto? <span class="auth-link" onclick="swTab('reg')">Registrer deg</span></div>
     <div class="auth-note"><span class="auth-link" style="color:var(--muted)" onclick="swTab('forgot')">Glemt passord?</span></div>
-    <div class="auth-note"><span class="auth-link" style="color:var(--muted);font-size:11px" onclick="swTab('admin')">Admininnlogging →</span></div>
    </div>
    <!-- Forgot password -->
    <div class="auth-panel" id="p-forgot">
@@ -557,14 +556,6 @@
     </div>
     <button class="btn btn-primary" onclick="doReg()" style="width:100%;justify-content:center">Opprett konto</button>
     <div class="auth-note">Har du konto? <span class="auth-link" onclick="swTab('login')">Logg inn</span></div>
-   </div>
-   <!-- Admin login -->
-   <div class="auth-panel" id="p-admin">
-    <div style="background:var(--accent-bg);border:1px solid rgba(184,154,90,.2);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--muted2)"><strong style="color:var(--accent)">Admin</strong> — kun for PawGate-ansatte</div>
-    <div class="field"><label>E-post</label><input type="email" class="inp" id="a-email" placeholder="admin@pawgate.no"></div>
-    <div class="field"><label>Passord</label><input type="password" class="inp" id="a-pass" placeholder="••••••••"></div>
-    <button class="btn btn-primary" onclick="doAdminLogin()" style="width:100%;justify-content:center">Logg inn som admin</button>
-    <div class="auth-note"><span class="auth-link" style="color:var(--muted)" onclick="swTab('login')">← Tilbake</span></div>
    </div>
   </div>
  </div>
@@ -599,6 +590,11 @@
    <div class="field" style="margin-bottom:16px"><label>Bekreft passord</label><input type="password" class="inp" id="p-pass2" placeholder="Gjenta passordet"></div>
    <button class="btn btn-ghost" onclick="updateProfilePassword()" style="width:100%;justify-content:center;margin-bottom:24px">Oppdater passord</button>
 
+   <div class="profile-divider" id="admin-divider" style="display:none"></div>
+   <button class="btn btn-ghost" id="profile-admin-btn" onclick="closeOv('profile-ov');openAdmin()" style="display:none;width:100%;justify-content:center;gap:8px;margin-bottom:12px">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Admin-panel
+   </button>
    <div class="profile-divider"></div>
    <button class="btn" onclick="doLogout()" style="width:100%;justify-content:center;background:rgba(184,90,74,.08);border:1px solid rgba(184,90,74,.25);color:#e07060">Logg ut</button>
   </div>
@@ -645,10 +641,17 @@
 <!-- ══ ADMIN SHELL ══ -->
 <div class="admin-shell" id="admin-shell">
  <div class="atopbar">
-  <div class="alogo"><div class="nav-logo-dot"></div>PAWGATE ADMIN</div>
   <div style="display:flex;align-items:center;gap:12px">
-   <span style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace" id="a-user-lbl">admin@pawgate.no</span>
-   <button class="btn btn-ghost" style="padding:7px 14px;font-size:12px" onclick="closeAdmin()">← Tilbake til nettsiden</button>
+   <div class="alogo"><div class="nav-logo-dot"></div>PAWGATE</div>
+   <span style="font-size:10px;color:var(--accent);font-family:'IBM Plex Mono',monospace;padding:2px 8px;background:var(--accent-bg);border-radius:5px;border:1px solid rgba(184,154,90,.25);letter-spacing:.08em">ADMIN</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+   <a href="https://pawgate.no" target="_blank" class="btn btn-ghost" style="padding:7px 14px;font-size:12px;text-decoration:none;display:flex;align-items:center;gap:6px">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    Forhåndsvis nettside
+   </a>
+   <span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;border-left:1px solid var(--border);padding-left:10px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="a-user-lbl"></span>
+   <button class="btn btn-ghost" style="padding:7px 14px;font-size:12px" onclick="closeAdmin()">← Tilbake</button>
   </div>
  </div>
  <div class="abody">
@@ -668,6 +671,8 @@
    <div class="anav" onclick="showAP('nl',this)"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>Nyhetsbrev</span></div>
    <div class="asec">System</div>
    <div class="anav" onclick="showAP('cfg',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Innstillinger</span></div>
+   <div class="asec">Tilgang</div>
+   <div class="anav" onclick="showAP('admins',this)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Administratorer</span></div>
   </div>
   <!-- Pages -->
   <div class="acontent">
@@ -780,6 +785,26 @@
       <div class="toggle on" onclick="this.classList.toggle('on')"></div>
      </div>
     </div></div>
+   </div>
+   <!-- ADMINISTRATORER -->
+   <div class="apage" id="ap-admins">
+    <div class="aptitle">Administratorer</div><div class="apsub">Brukere med tilgang til admin-panelet</div>
+    <div class="acard" style="margin-bottom:20px">
+     <div class="acard-hdr"><div class="acard-title">Legg til administrator</div></div>
+     <div class="acard-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="arow" style="grid-template-columns:1fr auto;align-items:flex-end;gap:10px">
+       <div class="field"><label>E-postadresse</label><input type="email" class="inp" id="new-admin-email" placeholder="bruker@pawgate.no"></div>
+       <button class="btn btn-primary" onclick="addAdmin()" style="height:42px;padding:0 20px">Legg til</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+       <strong style="color:var(--muted2)">Merk:</strong> Brukeren trenger ikke ha en eksisterende konto — bare legg til e-posten. De vil automatisk se Admin-panel-knappen neste gang de logger inn.
+      </div>
+     </div>
+    </div>
+    <div class="acard">
+     <div class="acard-hdr"><div class="acard-title">Alle administratorer</div></div>
+     <table class="atable"><thead><tr><th>E-post</th><th>Lagt til</th><th></th></tr></thead><tbody id="admins-tbody"><tr><td colspan="3" style="color:var(--muted);text-align:center;padding:24px;font-size:13px">Laster...</td></tr></tbody></table>
+    </div>
    </div>
   </div><!-- /acontent -->
  </div><!-- /abody -->

@@ -46,6 +46,23 @@ async function sbSaveUser(u) {
   if (error) throw error;
 }
 
+// ═══ Admin role ═══
+let _isAdmin = false;
+
+async function checkIsAdmin(email) {
+  try {
+    const { data } = await _sb.from('admins').select('email').eq('email', email).maybeSingle();
+    return !!data;
+  } catch(e) { return false; }
+}
+
+function updateProfileAdminBtn() {
+  const btn = document.getElementById('profile-admin-btn');
+  const div = document.getElementById('admin-divider');
+  if(btn) btn.style.display = _isAdmin ? 'flex' : 'none';
+  if(div) div.style.display = _isAdmin ? '' : 'none';
+}
+
 // ═══ Data ═══
 let users = [];
 let files = [
@@ -142,6 +159,8 @@ async function updateProfilePassword() {
 async function doLogout() {
   await _sb.auth.signOut();
   updateNavAuth(null);
+  _isAdmin = false;
+  updateProfileAdminBtn();
   closeOv('profile-ov');
   showOk('Logget ut', 'Du er nå logget ut av PawGate.', '👋');
 }
@@ -156,12 +175,12 @@ function openAuth(){ swTab('login'); openOv('auth-ov'); }
 function openDownloadModal(){ renderDLModal(); openOv('dl-ov'); }
 
 function swTab(t){
-  ['login','reg','admin','forgot'].forEach(id=>{
+  ['login','reg','forgot'].forEach(id=>{
     document.getElementById('t-'+id)?.classList.toggle('active',id===t);
     document.getElementById('p-'+id)?.classList.toggle('active',id===t);
   });
-  const titles={'login':'Logg inn','reg':'Registrer deg','admin':'Admin','forgot':'Glemt passord'};
-  const subs={'login':'Velkommen til PawGate','reg':'Opprett konto','admin':'Kun for PawGate-ansatte','forgot':'Vi sender deg en tilbakestillingslenke'};
+  const titles={'login':'Logg inn','reg':'Registrer deg','forgot':'Glemt passord'};
+  const subs={'login':'Velkommen til PawGate','reg':'Opprett konto','forgot':'Vi sender deg en tilbakestillingslenke'};
   document.querySelector('#auth-ov .mtitle').textContent = titles[t]||titles.login;
   document.querySelector('#auth-ov .msub').textContent = subs[t]||subs.login;
 }
@@ -173,6 +192,7 @@ async function doLogin(){
   const { data, error } = await _sb.auth.signInWithPassword({ email: e, password: p });
   if(error){ alert('Feil e-post eller passord. Prøv igjen.'); return; }
   updateNavAuth(data.user);
+  checkIsAdmin(data.user.email).then(isAdmin => { _isAdmin = isAdmin; updateProfileAdminBtn(); });
   const name = data.user.user_metadata?.name || e;
   closeOv('auth-ov');
   showOk('Innlogget!', `Velkommen tilbake, ${name.split(' ')[0]}!`, '👋');
@@ -202,12 +222,6 @@ async function doReg(){
   updateStats();
 }
 
-function doAdminLogin(){
-  const e=document.getElementById('a-email').value.trim();
-  const p=document.getElementById('a-pass').value;
-  if(e==='admin@pawgate.no'&&p==='PawG8!Admin#2026'){ closeOv('auth-ov'); openAdmin(); }
-  else alert('Feil e-post eller passord');
-}
 
 async function doResetPassword(){
   const p=document.getElementById('rp-pass').value;
@@ -270,6 +284,10 @@ function renderDLModal(){
 
 // ═══ Admin ═══
 function openAdmin(){
+  _sb.auth.getUser().then(({data:{user}})=>{
+    const lbl=document.getElementById('a-user-lbl');
+    if(lbl&&user) lbl.textContent=user.email;
+  });
   renderAdmin();
   document.getElementById('admin-shell').classList.add('open');
 }
@@ -287,6 +305,7 @@ function showAP(id,el){
   if(id==='files') renderFilesTable();
   if(id==='feat') renderFeatAdmin();
   if(id==='price') renderPriceAdmin();
+  if(id==='admins') renderAdminsPage();
 }
 
 async function renderAdmin(){
@@ -432,10 +451,16 @@ function toggleTheme(){
       document.body.style.overflow = 'hidden';
     }
     if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION'){
-      updateNavAuth(session?.user || null);
+      const user = session?.user || null;
+      updateNavAuth(user);
+      if(user){
+        checkIsAdmin(user.email).then(isAdmin=>{ _isAdmin=isAdmin; updateProfileAdminBtn(); });
+      }
     }
     if(event === 'SIGNED_OUT'){
       updateNavAuth(null);
+      _isAdmin = false;
+      updateProfileAdminBtn();
     }
   });
 })();
@@ -458,3 +483,44 @@ function updateNavBg(){
   }
 }
 window.addEventListener('scroll', updateNavBg);
+
+// ═══ Admin management ═══
+async function renderAdminsPage(){
+  const tbody=document.getElementById('admins-tbody'); if(!tbody)return;
+  tbody.innerHTML=`<tr><td colspan="3" style="color:var(--muted);text-align:center;padding:24px;font-size:13px">Laster...</td></tr>`;
+  const {data,error}=await _sb.from('admins').select('*').order('created_at',{ascending:true});
+  if(error||!data){ tbody.innerHTML=`<tr><td colspan="3" style="color:var(--muted);text-align:center;padding:24px;font-size:13px">Feil ved lasting av administratorer</td></tr>`; return; }
+  const {data:{user}}=await _sb.auth.getUser();
+  tbody.innerHTML='';
+  data.forEach(a=>{
+    const isSelf=user?.email===a.email;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-family:'IBM Plex Mono',monospace;font-size:12px">\${a.email}\${isSelf?' <span class="badge bgo" style="margin-left:6px;vertical-align:middle">deg</span>':''}</td><td style="color:var(--muted);font-size:12px">\${a.created_at?a.created_at.slice(0,10):'—'}</td><td><button class="btn" style="padding:5px 10px;font-size:11px;background:rgba(184,90,74,.1);border-color:rgba(184,90,74,.2);color:#e07060;\${isSelf?'opacity:.4;cursor:not-allowed':''}" \${isSelf?'disabled':''} onclick="removeAdmin('\${a.email}')">Fjern</button></td>`;
+    tbody.appendChild(tr);
+  });
+  if(!data.length) tbody.innerHTML=`<tr><td colspan="3" style="color:var(--muted);text-align:center;padding:24px;font-size:13px">Ingen administratorer funnet</td></tr>`;
+}
+
+async function addAdmin(){
+  const inp=document.getElementById('new-admin-email');
+  const email=inp.value.trim().toLowerCase();
+  if(!email||!email.includes('@')){ alert('Skriv inn en gyldig e-postadresse.'); return; }
+  const {error}=await _sb.from('admins').insert({email});
+  if(error){
+    if(error.code==='23505'||error.message.includes('unique')) alert('Denne e-posten er allerede administrator.');
+    else alert('Noe gikk galt: '+error.message);
+    return;
+  }
+  inp.value='';
+  renderAdminsPage();
+  showOk('Administrator lagt til!',`${email} har nå admin-tilgang og vil se admin-knappen neste gang de logger inn.`,'✅');
+}
+
+async function removeAdmin(email){
+  if(!confirm(`Fjern admin-tilgang for ${email}?`))return;
+  const {data:{user}}=await _sb.auth.getUser();
+  if(user?.email===email){ alert('Du kan ikke fjerne din egen admin-tilgang.'); return; }
+  const {error}=await _sb.from('admins').delete().eq('email',email);
+  if(error){ alert('Noe gikk galt.'); return; }
+  renderAdminsPage();
+}
