@@ -109,6 +109,9 @@ function updateNavAuth(user) {
 async function openProfile() {
   const { data: { user } } = await _sb.auth.getUser();
   if(!user) return;
+  // Always re-check admin on profile open so it works even if first check ran before table existed
+  const isAdmin = await checkIsAdmin(user.email);
+  _isAdmin = isAdmin;
   const meta = user.user_metadata || {};
   document.getElementById('profile-title').textContent = meta.name || 'Min profil';
   document.getElementById('profile-email-sub').textContent = user.email;
@@ -119,6 +122,7 @@ async function openProfile() {
   document.getElementById('p-email').value = user.email;
   document.getElementById('p-pass').value = '';
   document.getElementById('p-pass2').value = '';
+  updateProfileAdminBtn();
   openOv('profile-ov');
 }
 
@@ -150,9 +154,10 @@ async function updateProfilePassword() {
   if(!p || !p2) { alert('Fyll ut begge passordfelter.'); return; }
   if(p !== p2) { alert('Passordene stemmer ikke overens.'); return; }
   if(p.length < 8) { alert('Passordet må være minst 8 tegn.'); return; }
-  const { error } = await _sb.auth.updateUser({ password: p });
+  const { data, error } = await _sb.auth.updateUser({ password: p });
   if(error) { alert('Kunne ikke oppdatere passord. Prøv igjen.'); return; }
-  showOk('Passord oppdatert!', 'Ditt nye passord er aktivt.', '✅');
+  sendPasswordChangedEmail(data.user?.email);
+  showOk('Passord oppdatert!', 'Ditt nye passord er aktivt. Vi har sendt en bekreftelse til e-posten din.', '✅');
   closeOv('profile-ov');
 }
 
@@ -523,4 +528,83 @@ async function removeAdmin(email){
   const {error}=await _sb.from('admins').delete().eq('email',email);
   if(error){ alert('Noe gikk galt.'); return; }
   renderAdminsPage();
+}
+
+// ═══ Notification emails ═══
+function pgEmail(html) {
+  return `<!DOCTYPE html><html><body style="margin:0;padding:40px 20px;background:#0c0b09;font-family:Arial,sans-serif"><div style="max-width:540px;margin:0 auto;background:#161410;border:1px solid #2c2820;border-radius:16px;overflow:hidden"><div style="padding:28px 36px;border-bottom:1px solid #2c2820"><span style="display:inline-flex;align-items:center;gap:8px;font-family:monospace;font-size:15px;font-weight:600;letter-spacing:.12em;color:#ede8dc"><span style="width:8px;height:8px;border-radius:50%;background:#b89a5a;display:inline-block"></span>PAWGATE</span></div><div style="padding:36px">${html}</div><div style="padding:18px 36px;border-top:1px solid #2c2820;font-size:11px;color:#6a6458;font-family:monospace">© 2026 PawGate · Fra Norge 🇳🇴</div></div></body></html>`;
+}
+
+async function sendViaPawgateEmail(to, subject, bodyHtml) {
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer re_Nx2ZtM9o_7R9nv7mCiwxrqMTJ26nPAKhx', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: 'PawGate <hei@pawgate.no>', to, subject, html: pgEmail(bodyHtml) })
+    });
+  } catch(e) { console.error('Email failed:', e); }
+}
+
+function sendPasswordChangedEmail(toEmail) {
+  if(!toEmail) return;
+  sendViaPawgateEmail(toEmail, 'Passordet ditt er endret — PawGate',
+    `<h2 style="margin:0 0 16px;font-size:20px;font-weight:700;color:#ede8dc">Passord endret</h2>
+     <p style="margin:0 0 16px;color:#8a8070;line-height:1.7;font-size:15px">Vi bekrefter at passordet for <strong style="color:#ede8dc">${toEmail}</strong> nettopp ble endret.</p>
+     <p style="margin:0 0 24px;color:#8a8070;line-height:1.7;font-size:15px">Hvis du ikke gjorde dette, ta kontakt med oss umiddelbart.</p>
+     <a href="mailto:hei@pawgate.no" style="display:inline-block;padding:12px 24px;background:#b89a5a;color:#0c0b09;border-radius:10px;font-weight:700;text-decoration:none;font-size:14px">Kontakt support</a>`
+  );
+}
+
+// ═══ Newsletter sending ═══
+async function sendNewsletter() {
+  const subj = document.getElementById('nl-subj')?.value.trim();
+  const filter = document.getElementById('nl-filter')?.value;
+  const msg = document.getElementById('nl-msg')?.value.trim();
+  if(!subj) { alert('Emne mangler'); return; }
+  if(!msg) { alert('Melding mangler'); return; }
+  const allUsers = await sbLoadUsers();
+  const targets = filter === 'launch'
+    ? allUsers.filter(u => u.launch)
+    : allUsers.filter(u => u.nl);
+  if(!targets.length) { alert('Ingen mottakere funnet.'); return; }
+  if(!confirm(`Send nyhetsbrev til ${targets.length} mottaker(e)?`)) return;
+  const btn = document.getElementById('nl-send-btn');
+  const origTxt = btn?.textContent;
+  if(btn) { btn.disabled = true; btn.textContent = `Sender til ${targets.length}...`; }
+  const html = buildNLHtml(subj, msg);
+  let sent = 0, failed = 0;
+  const chunks = [];
+  for(let i = 0; i < targets.length; i += 100) chunks.push(targets.slice(i, i + 100));
+  for(const chunk of chunks) {
+    try {
+      const payload = chunk.map(u => ({ from: 'PawGate <hei@pawgate.no>', to: u.email, subject: subj, html }));
+      const res = await fetch('https://api.resend.com/emails/batch', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer re_Nx2ZtM9o_7R9nv7mCiwxrqMTJ26nPAKhx', 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if(Array.isArray(json.data)) json.data.forEach(r => r.id ? sent++ : failed++);
+      else failed += chunk.length;
+    } catch(e) { failed += chunk.length; }
+  }
+  if(btn) { btn.disabled = false; btn.textContent = origTxt; }
+  if(failed) showOk('Nyhetsbrev sendt', `${sent} sendt · ${failed} feilet. Sjekk Resend-dashbordet.`, '⚠️');
+  else showOk('Nyhetsbrev sendt! 📧', `Sendt til ${sent} abonnenter.`, '✅');
+}
+
+function buildNLHtml(subject, message) {
+  const lines = message.split('\n').map(l => l.trim() ? `<p style="margin:0 0 14px;color:#8a8070;line-height:1.7;font-size:15px">${l}</p>` : '<br>').join('');
+  return pgEmail(
+    `<h2 style="margin:0 0 20px;font-size:20px;font-weight:700;color:#ede8dc">${subject}</h2>
+     ${lines}
+     <p style="margin:16px 0 0;font-size:13px;color:#6a6458">Spørsmål? <a href="mailto:hei@pawgate.no" style="color:#b89a5a;text-decoration:none">hei@pawgate.no</a></p>`
+  );
+}
+
+function previewNewsletter() {
+  const subj = document.getElementById('nl-subj')?.value.trim() || 'Forhåndsvisning';
+  const msg = document.getElementById('nl-msg')?.value.trim() || '(ingen melding)';
+  const w = window.open('', '_blank');
+  if(w) { w.document.write(buildNLHtml(subj, msg)); w.document.close(); }
 }

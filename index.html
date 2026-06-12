@@ -761,10 +761,10 @@
    <div class="apage" id="ap-nl">
     <div class="aptitle">Nyhetsbrev</div><div class="apsub">Send til abonnenter</div>
     <div class="acard"><div class="acard-hdr"><div class="acard-title">Send melding</div></div><div class="acard-body" style="display:flex;flex-direction:column;gap:12px">
-     <div class="field"><label>Emne</label><input type="text" class="inp" placeholder="f.eks. PawGate-appen er nå klar!"></div>
-     <div class="field"><label>Mottakere</label><select class="inp"><option>Alle abonnenter</option><option>Kun lanserings-varsler</option></select></div>
-     <div class="field"><label>Melding</label><textarea class="inp" style="min-height:120px" placeholder="Skriv her..."></textarea></div>
-     <div style="display:flex;gap:8px"><button class="btn btn-primary" onclick="alert('Sendt! (demo)')">Send</button><button class="btn btn-ghost">Forhåndsvisning</button></div>
+     <div class="field"><label>Emne</label><input type="text" class="inp" id="nl-subj" placeholder="f.eks. PawGate-appen er nå klar!"></div>
+     <div class="field"><label>Mottakere</label><select class="inp" id="nl-filter"><option value="all">Alle nyhetsbrev-abonnenter</option><option value="launch">Kun lanserings-varsler</option></select></div>
+     <div class="field"><label>Melding</label><textarea class="inp" id="nl-msg" style="min-height:120px" placeholder="Skriv din melding her...&#10;&#10;Du kan bruke linjeskift for avsnitt."></textarea></div>
+     <div style="display:flex;gap:8px"><button class="btn btn-primary" id="nl-send-btn" onclick="sendNewsletter()">Send</button><button class="btn btn-ghost" onclick="previewNewsletter()">Forhåndsvisning</button></div>
     </div></div>
     <div class="acard"><div class="acard-hdr"><div class="acard-title">Abonnenter (<span id="nl-n">0</span>)</div></div><table class="atable"><thead><tr><th>E-post</th><th>Lansering</th><th>Dato</th></tr></thead><tbody id="nl-tbody"></tbody></table></div>
    </div>
