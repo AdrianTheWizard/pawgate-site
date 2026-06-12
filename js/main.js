@@ -1,13 +1,24 @@
-// ═══ Persistent storage helpers ═══
-function loadUsers() {
-  try { return JSON.parse(localStorage.getItem('pg_users') || '[]'); } catch(e) { return []; }
+// ═══ Supabase ═══
+const _sb = supabase.createClient(
+  'https://mzabpomdobkeuhwcjyvs.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16YWJwb21kb2JrZXVod2NqeXZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNTYzMzAsImV4cCI6MjA5NjgzMjMzMH0.bb4q28cVQiNfwIhEeqJpuJgP2Ro0FUdMe7AeSG-i0ak'
+);
+
+async function sbLoadUsers() {
+  const { data, error } = await _sb.from('registrations').select('*').order('created_at', { ascending: false });
+  if (error) { console.error('Supabase load error:', error); return []; }
+  return data.map(r => ({ name: r.name, email: r.email, date: r.created_at.slice(0,10), nl: r.newsletter, launch: r.launch_notify }));
 }
-function saveUsers() {
-  try { localStorage.setItem('pg_users', JSON.stringify(users)); } catch(e) {}
+
+async function sbSaveUser(u) {
+  const { error } = await _sb.from('registrations').insert({
+    name: u.name, email: u.email, newsletter: u.nl, launch_notify: u.launch
+  });
+  if (error) throw error;
 }
 
 // ═══ Data ═══
-let users = loadUsers();
+let users = [];
 let files = [
   {name:'Interaktiv prototype', type:'Proto', cat:'app', url:'kennel-app-prototype.html', meta:'HTML · v0.9 beta', status:'available'},
   {name:'3D-modell hundeluke',  type:'3D',    cat:'doc', url:'pawgate-door-3d.html',      meta:'HTML · Interaktiv', status:'available'},
@@ -52,15 +63,21 @@ function doLogin(){
   showOk('Innlogget!',`Velkommen tilbake, \${e}`,'👋');
 }
 
-function doReg(){
+async function doReg(){
   const n=document.getElementById('r-name').value.trim();
   const e=document.getElementById('r-email').value.trim();
   const p=document.getElementById('r-pass').value;
   if(!n||!e||!p){ alert('Fyll ut alle feltene'); return; }
   const nl=document.getElementById('r-nl').checked;
   const launch=document.getElementById('r-launch').checked;
-  users.push({name:n,email:e,date:new Date().toISOString().slice(0,10),nl,launch});
-  saveUsers();
+  const u={name:n,email:e,date:new Date().toISOString().slice(0,10),nl,launch};
+  try {
+    await sbSaveUser(u);
+    users.push(u);
+  } catch(err) {
+    if(err.code==='23505'){ alert('Denne e-posten er allerede registrert.'); return; }
+    console.error(err);
+  }
   closeOv('auth-ov');
   showOk('Registrert!', nl?'Vi sender deg en e-post når det er noe nytt fra PawGate.':'Kontoen din er opprettet. Velkommen!', '🎉');
   updateStats();
@@ -125,14 +142,15 @@ function showAP(id,el){
   document.querySelectorAll('.anav').forEach(n=>n.classList.remove('on'));
   document.getElementById('ap-'+id).classList.add('on');
   el.classList.add('on');
-  if(id==='users') renderUsersTable();
-  if(id==='nl') renderNLTable();
+  if(id==='users') sbLoadUsers().then(u=>{users=u;renderUsersTable();});
+  if(id==='nl') sbLoadUsers().then(u=>{users=u;renderNLTable();});
   if(id==='files') renderFilesTable();
   if(id==='feat') renderFeatAdmin();
   if(id==='price') renderPriceAdmin();
 }
 
-function renderAdmin(){
+async function renderAdmin(){
+  users = await sbLoadUsers();
   updateStats();
   renderFilesTable();
   renderUsersTable();
