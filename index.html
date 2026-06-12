@@ -571,6 +571,20 @@
  </div>
 </div>
 
+<!-- ══ PASSWORD RESET OVERLAY ══ -->
+<div class="overlay" id="reset-ov">
+ <div class="omodal" style="max-width:420px">
+  <div class="mhdr">
+   <div><div class="mtitle">Nytt passord</div><div class="msub">Skriv inn ditt nye passord</div></div>
+  </div>
+  <div class="mbody" style="display:flex;flex-direction:column;gap:14px">
+   <div class="field"><label>Nytt passord</label><input type="password" class="inp" id="rp-pass" placeholder="Minst 8 tegn"></div>
+   <div class="field"><label>Bekreft passord</label><input type="password" class="inp" id="rp-pass2" placeholder="Gjenta passordet"></div>
+   <button class="btn btn-primary" onclick="doResetPassword()" style="width:100%;justify-content:center">Lagre nytt passord</button>
+  </div>
+ </div>
+</div>
+
 <!-- ══ SUCCESS OVERLAY ══ -->
 <div class="overlay" id="ok-ov" onclick="if(event.target===this)closeOv('ok-ov')">
  <div class="omodal" style="max-width:380px">

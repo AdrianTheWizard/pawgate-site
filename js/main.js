@@ -126,6 +126,18 @@ function doAdminLogin(){
   else alert('Feil e-post eller passord');
 }
 
+async function doResetPassword(){
+  const p=document.getElementById('rp-pass').value;
+  const p2=document.getElementById('rp-pass2').value;
+  if(!p||!p2){ alert('Fyll ut begge feltene.'); return; }
+  if(p!==p2){ alert('Passordene stemmer ikke overens.'); return; }
+  if(p.length<8){ alert('Passordet må være minst 8 tegn.'); return; }
+  const { error } = await _sb.auth.updateUser({ password: p });
+  if(error){ alert('Noe gikk galt. Prøv å be om en ny tilbakestillingslenke.'); return; }
+  document.getElementById('reset-ov').classList.remove('open');
+  showOk('Passord oppdatert!','Du kan nå logge inn med ditt nye passord.','✅');
+}
+
 async function doForgot(){
   const e=document.getElementById('f-email').value.trim();
   if(!e){ alert('Skriv inn e-postadressen din.'); return; }
@@ -329,6 +341,15 @@ function toggleTheme(){
   localStorage.setItem('pg-theme', next);
   updateNavBg();
 }
+
+(function handleAuthRedirect(){
+  _sb.auth.onAuthStateChange((event) => {
+    if(event === 'PASSWORD_RECOVERY'){
+      document.getElementById('reset-ov').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  });
+})();
 
 (function initTheme(){
   const saved = localStorage.getItem('pg-theme');
