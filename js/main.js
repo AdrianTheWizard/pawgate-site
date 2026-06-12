@@ -173,7 +173,6 @@ async function doLogout() {
 // ═══ Overlay utils ═══
 function openOv(id){ document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeOv(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
-document.addEventListener('keydown', e=>{ if(e.key==='Escape')['auth-ov','dl-ov','ok-ov'].forEach(closeOv); });
 
 // ═══ Auth ═══
 function openAuth(){ swTab('login'); openOv('auth-ov'); }
