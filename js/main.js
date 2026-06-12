@@ -536,15 +536,7 @@ function activateEditMode() {
         <button class="pg-fmt-btn" id="pg-btn-i" title="Kursiv (Ctrl+I)"><i>I</i></button>
         <button class="pg-fmt-btn" id="pg-btn-u" title="Understrek (Ctrl+U)"><u>U</u></button>
         <div class="pg-fmt-div"></div>
-        <select class="pg-fmt-sel" id="pg-size-sel" title="Tekststørrelse">
-          <option value="">Størrelse</option>
-          <option value="11px">Liten (11)</option>
-          <option value="14px">Normal (14)</option>
-          <option value="18px">Mellomstor (18)</option>
-          <option value="24px">Stor (24)</option>
-          <option value="32px">Ekstra stor (32)</option>
-          <option value="48px">Gigant (48)</option>
-        </select>
+        <input type="number" class="pg-fmt-sel" id="pg-size-sel" title="Tekststørrelse (1-100)" placeholder="px" min="1" max="100" style="width:54px;text-align:center">
         <div class="pg-fmt-div"></div>
         <label title="Tekstfarge" style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;font-weight:600;color:#0c0b09">
           Farge<input type="color" id="pg-color-inp" value="#ede8dc" style="width:26px;height:24px;border:1px solid rgba(0,0,0,.2);border-radius:4px;cursor:pointer;padding:1px 2px;background:transparent">
@@ -569,8 +561,9 @@ function activateEditMode() {
   document.getElementById('pg-btn-clear').addEventListener('mousedown', e => { e.preventDefault(); document.execCommand('removeFormat'); updateFormatBar(); });
 
   document.getElementById('pg-size-sel').addEventListener('change', e => {
-    if (!e.target.value) return;
-    applyFontSize(e.target.value);
+    const v = parseInt(e.target.value);
+    if (!v || v < 1 || v > 100) return;
+    applyFontSize(v + 'px');
     e.target.value = '';
   });
 
