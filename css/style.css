@@ -788,7 +788,11 @@ footer {
   .nav-links        { display: none; }
   nav               { padding: 0 16px; }
   .nav-cta          { gap: 6px; }
-  .nav-cta .btn-ghost#nav-login { display: none !important; }
+  /* Collapse "Hent appen" to icon-only so login still fits */
+  .nav-btn-lbl      { display: none; }
+  .nav-cta .btn-primary { padding: 9px 10px; gap: 0; }
+  /* Keep login visible but compact */
+  #nav-login        { padding: 7px 10px; font-size: 12px; }
 
   /* Layout */
   .container        { padding: 0 16px; }
@@ -831,8 +835,9 @@ footer {
   .footer-inner     { grid-template-columns: 1fr; gap: 28px; }
   .footer-bottom    { flex-direction: column; gap: 8px; text-align: center; }
 
-  /* Modals */
-  .omodal           { border-radius: 16px; margin: 12px; }
+  /* Modals — make them scroll on small screens instead of getting cut off */
+  .overlay          { align-items: flex-start; padding: 12px; }
+  .omodal           { border-radius: 16px; margin: 0 auto; max-height: calc(100dvh - 24px); overflow-y: auto; }
   .mbody            { padding: 20px; }
   .mhdr             { padding: 20px; }
 }
@@ -843,6 +848,63 @@ footer {
   .hero-stats       { gap: 16px; }
   .stat-num         { font-size: 20px; }
 }
+
+/* Extra-small phones: shrink login padding further */
+@media (max-width: 360px) {
+  #nav-login        { padding: 7px 7px; font-size: 11px; }
+}
+
+/* Landscape / short viewport — modal must scroll, not overflow */
+@media (max-height: 700px) {
+  .overlay          { align-items: flex-start; padding: 8px; }
+  .omodal           { border-radius: 14px; margin: 0 auto; max-height: calc(100dvh - 16px); overflow-y: auto; }
+  .mhdr             { padding: 14px 20px 12px; }
+  .mbody            { padding: 16px 20px 20px; gap: 10px; }
+}
+
+/* ── Visual editor format toolbar ── */
+.pg-fmt-btn {
+  background: rgba(0,0,0,.15);
+  border: 1px solid rgba(0,0,0,.18);
+  border-radius: 6px;
+  padding: 5px 9px;
+  color: #0c0b09;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  transition: background .1s;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.pg-fmt-btn:hover   { background: rgba(0,0,0,.28); }
+.pg-fmt-btn.pg-active { background: rgba(0,0,0,.38); box-shadow: inset 0 1px 3px rgba(0,0,0,.3); }
+.pg-fmt-sel {
+  background: rgba(0,0,0,.15);
+  border: 1px solid rgba(0,0,0,.18);
+  border-radius: 6px;
+  padding: 5px 6px;
+  color: #0c0b09;
+  font-size: 11px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+  outline: none;
+}
+.pg-fmt-div { width: 1px; height: 20px; background: rgba(0,0,0,.22); margin: 0 4px; flex-shrink: 0; }
+
+/* Image zone edit overlay */
+.pg-img-zone-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(12,11,9,.6);
+  backdrop-filter: blur(2px);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+  z-index: 2;
+  text-align: center;
+}
+.hardware-visual:hover .pg-img-zone-overlay { opacity: 1; }
 
 /* ── Coming soon card ── */
 .coming-soon-card{opacity:.75;position:relative}
