@@ -59,6 +59,7 @@ function updateProfileAdminBtn() {
 // ═══ Data ═══
 let users = [];
 let files = [
+  {name:'PawGate for Windows',  type:'Win',   cat:'app', url:'https://github.com/AdrianTheWizard/pawgate-app/releases/download/v1.0.0/PawGate.Setup.1.0.0.exe', meta:'Windows 10/11 · v1.0.0', status:'available'},
   {name:'Interaktiv prototype', type:'Proto', cat:'app', url:'kennel-app-prototype.html', meta:'HTML · v0.9 beta', status:'available'},
   {name:'3D-modell hundeluke',  type:'3D',    cat:'doc', url:'pawgate-door-3d.html',      meta:'HTML · Interaktiv', status:'available'},
   {name:'Teknisk skisse',       type:'Skisse',cat:'doc', url:'pawgate-handskisse.html',   meta:'HTML · Handskisse', status:'available'},
