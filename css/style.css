@@ -44,7 +44,9 @@ body {
   font-family: 'IBM Plex Sans', sans-serif;
   line-height: 1.6;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
+*, *::before, *::after { min-width: 0; }
 
 /* ── Typography ── */
 .mono { font-family: 'IBM Plex Mono', monospace; }
@@ -774,10 +776,66 @@ footer {
   .download-inner   { grid-template-columns: 1fr; }
   .footer-inner     { grid-template-columns: 1fr 1fr; }
 }
+
 @media (max-width: 600px) {
-  .features-grid    { grid-template-columns: 1fr; }
+  /* Nav */
   .nav-links        { display: none; }
-  .footer-inner     { grid-template-columns: 1fr; }
+  nav               { padding: 0 16px; }
+  .nav-cta          { gap: 6px; }
+  .nav-cta .btn-ghost#nav-login { display: none !important; }
+
+  /* Layout */
+  .container        { padding: 0 16px; }
+  section           { padding: 64px 0; }
+  .section-header   { margin-bottom: 36px; }
+
+  /* Hero */
+  .hero-inner       { padding: 48px 0 64px; gap: 32px; }
+  .hero-title       { font-size: clamp(30px, 9vw, 40px); }
+  .hero-body        { font-size: 15px; }
+  .hero-actions     { flex-direction: column; }
+  .hero-actions .btn { justify-content: center; }
+  .hero-stats       { gap: 20px; flex-wrap: wrap; }
+  .stat-num         { font-size: 22px; }
+
+  /* Phone mockup — scale down */
+  .phone-outer      { width: 200px; height: 406px; border-radius: 36px; }
+  .phone-glow       { width: 220px; height: 220px; }
+
+  /* Features */
+  .features-grid    { grid-template-columns: 1fr; }
+  .feature-card     { padding: 24px 20px; }
+
+  /* How it works */
+  .how-grid         { grid-template-columns: 1fr; gap: 28px; }
+  .how-step         { padding: 0 8px; }
+
+  /* Hardware */
+  .hardware-visual  { padding: 24px; aspect-ratio: auto; }
+
+  /* Pricing */
+  .price-card       { padding: 24px 20px; }
+  .price-amount     { font-size: 28px; }
+
+  /* Download */
+  .download-inner   { gap: 24px; }
+  .download-item    { flex-wrap: wrap; gap: 10px; }
+
+  /* Footer */
+  .footer-inner     { grid-template-columns: 1fr; gap: 28px; }
+  .footer-bottom    { flex-direction: column; gap: 8px; text-align: center; }
+
+  /* Modals */
+  .omodal           { border-radius: 16px; margin: 12px; }
+  .mbody            { padding: 20px; }
+  .mhdr             { padding: 20px; }
+}
+
+@media (max-width: 400px) {
+  .btn-primary      { padding: 10px 14px; font-size: 12px; }
+  .theme-toggle     { padding: 8px; }
+  .hero-stats       { gap: 16px; }
+  .stat-num         { font-size: 20px; }
 }
 
 /* ── Coming soon card ── */
