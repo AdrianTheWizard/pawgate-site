@@ -4,6 +4,35 @@ const _sb = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16YWJwb21kb2JrZXVod2NqeXZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNTYzMzAsImV4cCI6MjA5NjgzMjMzMH0.bb4q28cVQiNfwIhEeqJpuJgP2Ro0FUdMe7AeSG-i0ak'
 );
 
+// ═══ Resend email ═══
+async function sendWelcomeEmail(name, toEmail) {
+  const html = `<!DOCTYPE html><html><body style="margin:0;padding:40px 20px;background:#0c0b09;font-family:Arial,sans-serif">
+  <div style="max-width:540px;margin:0 auto;background:#161410;border:1px solid #2c2820;border-radius:16px;overflow:hidden">
+    <div style="padding:28px 36px;border-bottom:1px solid #2c2820">
+      <span style="display:inline-flex;align-items:center;gap:8px;font-family:monospace;font-size:15px;font-weight:600;letter-spacing:.12em;color:#ede8dc">
+        <span style="width:8px;height:8px;border-radius:50%;background:#b89a5a;display:inline-block"></span>PAWGATE
+      </span>
+    </div>
+    <div style="padding:36px">
+      <h2 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#ede8dc">Hei ${name}!</h2>
+      <p style="margin:0 0 20px;color:#8a8070;line-height:1.7;font-size:15px">Takk for at du registrerte deg hos PawGate. Du er nå på listen og vil få beskjed så snart appen er klar for nedlasting.</p>
+      <div style="background:#1e1c16;border:1px solid #2c2820;border-radius:12px;padding:20px 24px;margin-bottom:24px">
+        <div style="font-size:11px;color:#b89a5a;font-family:monospace;letter-spacing:.12em;margin-bottom:8px;text-transform:uppercase">Hva skjer nå?</div>
+        <p style="margin:0;font-size:14px;color:#ede8dc;line-height:1.65">Vi jobber med å ferdigstille PawGate — smart kennelstyring for seriøse kenneleiere. Du hører fra oss!</p>
+      </div>
+      <p style="margin:0;font-size:13px;color:#6a6458;line-height:1.6">Spørsmål? Ta kontakt på <a href="mailto:hei@pawgate.no" style="color:#b89a5a;text-decoration:none">hei@pawgate.no</a></p>
+    </div>
+    <div style="padding:18px 36px;border-top:1px solid #2c2820;font-size:11px;color:#6a6458;font-family:monospace">© 2026 PawGate · Fra Norge 🇳🇴</div>
+  </div></body></html>`;
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer re_Nx2ZtM9o_7R9nv7mCiwxrqMTJ26nPAKhx', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: 'PawGate <hei@pawgate.no>', to: toEmail, subject: 'Velkommen til PawGate! 🐾', html })
+    });
+  } catch(e) { console.error('Email send failed:', e); }
+}
+
 async function sbLoadUsers() {
   const { data, error } = await _sb.from('registrations').select('*').order('created_at', { ascending: false });
   if (error) { console.error('Supabase load error:', error); return []; }
@@ -46,21 +75,24 @@ function openAuth(){ swTab('login'); openOv('auth-ov'); }
 function openDownloadModal(){ renderDLModal(); openOv('dl-ov'); }
 
 function swTab(t){
-  ['login','reg','admin'].forEach(id=>{
+  ['login','reg','admin','forgot'].forEach(id=>{
     document.getElementById('t-'+id)?.classList.toggle('active',id===t);
     document.getElementById('p-'+id)?.classList.toggle('active',id===t);
   });
-  if(t==='login'){ document.getElementById('t-login').classList.add('active'); document.getElementById('p-login').classList.add('active'); }
-  else if(t==='reg'){ document.getElementById('t-reg').classList.add('active'); document.getElementById('p-reg').classList.add('active'); }
-  else if(t==='admin'){ document.getElementById('p-admin').classList.add('active'); }
+  const titles={'login':'Logg inn','reg':'Registrer deg','admin':'Admin','forgot':'Glemt passord'};
+  const subs={'login':'Velkommen til PawGate','reg':'Opprett konto','admin':'Kun for PawGate-ansatte','forgot':'Vi sender deg en tilbakestillingslenke'};
+  document.querySelector('#auth-ov .mtitle').textContent = titles[t]||titles.login;
+  document.querySelector('#auth-ov .msub').textContent = subs[t]||subs.login;
 }
 
-function doLogin(){
+async function doLogin(){
   const e=document.getElementById('l-email').value.trim();
   const p=document.getElementById('l-pass').value;
   if(!e||!p){ alert('Fyll ut alle feltene'); return; }
+  const { error } = await _sb.auth.signInWithPassword({ email: e, password: p });
+  if(error){ alert('Feil e-post eller passord. Prøv igjen.'); return; }
   closeOv('auth-ov');
-  showOk('Innlogget!',`Velkommen tilbake, \${e}`,'👋');
+  showOk('Innlogget!',`Velkommen tilbake, ${e}`,'👋');
 }
 
 async function doReg(){
@@ -68,18 +100,22 @@ async function doReg(){
   const e=document.getElementById('r-email').value.trim();
   const p=document.getElementById('r-pass').value;
   if(!n||!e||!p){ alert('Fyll ut alle feltene'); return; }
+  if(p.length<8){ alert('Passordet må være minst 8 tegn.'); return; }
   const nl=document.getElementById('r-nl').checked;
   const launch=document.getElementById('r-launch').checked;
-  const u={name:n,email:e,date:new Date().toISOString().slice(0,10),nl,launch};
-  try {
-    await sbSaveUser(u);
-    users.push(u);
-  } catch(err) {
-    if(err.code==='23505'){ alert('Denne e-posten er allerede registrert.'); return; }
-    console.error(err);
+  const { error: authErr } = await _sb.auth.signUp({
+    email: e, password: p,
+    options: { data: { name: n } }
+  });
+  if(authErr){
+    if(authErr.message.includes('already registered')){ alert('Denne e-posten er allerede registrert.'); return; }
+    alert('Noe gikk galt. Prøv igjen.'); console.error(authErr); return;
   }
+  const u={name:n,email:e,date:new Date().toISOString().slice(0,10),nl,launch};
+  try { await sbSaveUser(u); users.push(u); } catch(err){ console.error(err); }
+  sendWelcomeEmail(n, e);
   closeOv('auth-ov');
-  showOk('Registrert!', nl?'Vi sender deg en e-post når det er noe nytt fra PawGate.':'Kontoen din er opprettet. Velkommen!', '🎉');
+  showOk('Registrert!','Sjekk e-posten din for en bekreftelse fra PawGate.','🎉');
   updateStats();
 }
 
@@ -88,6 +124,15 @@ function doAdminLogin(){
   const p=document.getElementById('a-pass').value;
   if(e==='admin@pawgate.no'&&p==='PawG8!Admin#2026'){ closeOv('auth-ov'); openAdmin(); }
   else alert('Feil e-post eller passord');
+}
+
+async function doForgot(){
+  const e=document.getElementById('f-email').value.trim();
+  if(!e){ alert('Skriv inn e-postadressen din.'); return; }
+  const { error } = await _sb.auth.resetPasswordForEmail(e, { redirectTo: 'https://pawgate.no' });
+  if(error){ alert('Noe gikk galt. Prøv igjen.'); return; }
+  closeOv('auth-ov');
+  showOk('E-post sendt!','Sjekk innboksen din for en lenke for å tilbakestille passordet.','📧');
 }
 
 function showOk(title,body,icon='🎉'){

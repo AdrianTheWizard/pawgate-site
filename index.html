@@ -536,7 +536,14 @@
     <div class="field"><label>Passord</label><input type="password" class="inp" id="l-pass" placeholder="••••••••"></div>
     <button class="btn btn-primary" onclick="doLogin()" style="width:100%;justify-content:center">Logg inn</button>
     <div class="auth-note">Ingen konto? <span class="auth-link" onclick="swTab('reg')">Registrer deg</span></div>
+    <div class="auth-note"><span class="auth-link" style="color:var(--muted)" onclick="swTab('forgot')">Glemt passord?</span></div>
     <div class="auth-note"><span class="auth-link" style="color:var(--muted);font-size:11px" onclick="swTab('admin')">Admininnlogging →</span></div>
+   </div>
+   <!-- Forgot password -->
+   <div class="auth-panel" id="p-forgot">
+    <div class="field"><label>E-post</label><input type="email" class="inp" id="f-email" placeholder="din@epost.no"></div>
+    <button class="btn btn-primary" onclick="doForgot()" style="width:100%;justify-content:center">Send tilbakestillingslenke</button>
+    <div class="auth-note"><span class="auth-link" style="color:var(--muted)" onclick="swTab('login')">← Tilbake</span></div>
    </div>
    <!-- Register -->
    <div class="auth-panel" id="p-reg">
