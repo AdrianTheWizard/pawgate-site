@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PawGate — Smart kennelstyring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    PAWGATE
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Funksjoner</a></li>
+    <li><a href="#hardware">Hardware</a></li>
+    <li><a href="#pricing">Priser</a></li>
+  </ul>
+  <div class="nav-cta">
+    <button class="btn btn-ghost theme-toggle" onclick="toggleTheme()" title="Bytt tema" aria-label="Bytt mellom lyst og mørkt tema">
+      <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="btn btn-primary" onclick="openDownloadModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span class="nav-btn-lbl">Hent appen</span>
+    </button>
+    <button class="btn btn-ghost" id="nav-login" onclick="openAuth()">Logg inn</button>
+    <button class="nav-avatar" id="nav-avatar" onclick="openProfile()" style="display:none" title="Min profil"></button>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero" id="home">
+  <div class="container">
+    <div class="hero-inner">
+
+      <div class="hero-text">
+        <div class="eyebrow hero-eyebrow" data-pg-key="hero.eyebrow">Smart kennelstyring</div>
+        <h1 class="hero-title" data-pg-key="hero.title">
+          Kontroll over<br>
+          kennel<em>en din</em><br>
+          fra telefonen
+        </h1>
+        <p class="hero-body" data-pg-key="hero.body">
+          PawGate gir deg full oversikt og styring — hundeluker, spyling, kamera og oppgaver — alt i én app. Designet for seriøse kenneleiere.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" onclick="openDownloadModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Last ned appen
+          </button>
+          <a href="#features" class="btn btn-outline btn-lg">Les meir</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-num">∞</div>
+            <div class="stat-lbl">Bingar per anlegg</div>
+          </div>
+          <div>
+            <div class="stat-num">24/7</div>
+            <div class="stat-lbl">Sanntid overvaking</div>
+          </div>
+          <div>
+            <div class="stat-num">IP65</div>
+            <div class="stat-lbl">Vasstett hardware</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone mockup -->
+      <div class="hero-visual">
+        <div class="phone-glow"></div>
+        <div class="phone-wrap">
+          <div class="phone-outer">
+            <div class="phone-screen">
+              <div class="phone-notch"></div>
+              <div class="phone-statusbar"><span>09:41</span><span>▲▲ 100%</span></div>
+              <div class="phone-topbar">
+                <div class="phone-app-name">PawGate</div>
+                <div class="phone-kennel">Vestland Kennel</div>
+              </div>
+              <div class="phone-strip">
+                <div class="phone-pill"><div class="phone-pill-num open">3</div><div class="phone-pill-lbl">Opne luker</div></div>
+                <div class="phone-pill"><div class="phone-pill-num close">1</div><div class="phone-pill-lbl">Lukka</div></div>
+                <div class="phone-pill"><div class="phone-pill-num gold">8</div><div class="phone-pill-lbl">Bingar</div></div>
+              </div>
+
+              <!-- Binge 1 -->
+              <div class="phone-binge">
+                <div class="binge-header">
+                  <div><div class="binge-name">Binge 1</div><div class="binge-dog">Bella · Border Collie</div></div>
+                  <div class="binge-badge badge-open">OPEN</div>
+                </div>
+                <div class="binge-btns">
+                  <div class="binge-btn">Lukk</div>
+                  <div class="binge-btn primary">Spyl</div>
+                  <div class="binge-btn">📷</div>
+                </div>
+              </div>
+
+              <!-- Binge 2 -->
+              <div class="phone-binge">
+                <div class="binge-header">
+                  <div><div class="binge-name">Binge 2</div><div class="binge-dog">Luna · Border Collie</div></div>
+                  <div class="binge-badge badge-close">LUKKA</div>
+                </div>
+                <div class="binge-btns">
+                  <div class="binge-btn primary">Opne</div>
+                  <div class="binge-btn">Spyl</div>
+                  <div class="binge-btn">📷</div>
+                </div>
+              </div>
+
+              <!-- Camera -->
+              <div style="padding: 0 10px 10px">
+                <div class="phone-cam">
+                  <div class="phone-cam-grid"></div>
+                  <div class="phone-cam-live"><div class="cam-dot"></div>LIVE</div>
+                  <div class="phone-dog-silhouette">🐕</div>
+                </div>
+              </div>
+
+              <!-- Nav -->
+              <div class="phone-nav">
+                <div class="phone-nav-item active">
+                  <svg class="phone-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  Oversikt
+                </div>
+                <div class="phone-nav-item">
+                  <svg class="phone-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Kalender
+                </div>
+                <div class="phone-nav-item">
+                  <svg class="phone-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                  Varslar
+                </div>
+                <div class="phone-nav-item">
+                  <svg class="phone-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+                  Innst.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section id="features" class="features-bg">
+  <div class="container">
+    <div class="section-header">
+      <div class="eyebrow" data-pg-key="feat.eyebrow">Funksjoner</div>
+      <h2 class="section-title" data-pg-key="feat.title">Alt du trenger i én app</h2>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M16 3v18"/><circle cx="14" cy="12" r="1.5"/></svg>
+        </div>
+        <div class="feature-title">Automatiske hundeluker</div>
+        <div class="feature-body">Sett timere for hver binge — luken åpner og lukker seg selv. Styr manuelt fra hvor som helst i verden.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
+        </div>
+        <div class="feature-title">Automatisk spyling</div>
+        <div class="feature-body">Automatisk spyling på faste tider. Se siste spyling og start manuelt på sekundet om noe kommer opp.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div class="feature-title">Live kamera</div>
+        <div class="feature-body">Se live-bilder fra alle binger direkte i appen. Støtter RTSP, ONVIF, WiFi og PawGate eget kamera.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <div class="feature-title">Flerbruker med roller</div>
+        <div class="feature-body">Inviter ansatte med nøyaktig de tilgangene de skal ha. Eier, administrator, ansatt eller leser — eller lag egne roller.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+        <div class="feature-title">Smarte varsler</div>
+        <div class="feature-body">Varsel hvis temperaturen er feil, spyling ikke er gjort, kamera mister signal, eller en luke ikke svarer.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="feature-title">Oppgavekalender</div>
+        <div class="feature-body">Planlegg og fordel daglig arbeid — vaksinering, veterinærtime, rengjøring og alt annet. Med egne kategorier og farger.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section>
+  <div class="container">
+    <div class="section-header" style="text-align:center">
+      <div class="eyebrow" data-pg-key="how.eyebrow">Slik fungerer det</div>
+      <h2 class="section-title" data-pg-key="how.title">Fra boks til full kontroll</h2>
+    </div>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-title">Monter hardware</div>
+        <div class="how-body">PawGate-kassetten skrues inn i en standardåpning i veggen. Ingen boring i betong — ingen fagfolk nødvendig.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-title">Koble til WiFi</div>
+        <div class="how-body">Hver binge har en ESP32 som kobler seg automatisk til ditt lokale nettverk.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-title">Last ned appen</div>
+        <div class="how-body">iOS eller Android — appen finner utstyret ditt automatisk og setter opp oversikten din på under to minutter.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">4</div>
+        <div class="how-title">Full kontroll</div>
+        <div class="how-body">Styr alt fra hvor som helst. Sett timere, se kamera, få varsler og inviter hele teamet.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HARDWARE ── -->
+<section id="hardware" class="features-bg">
+  <div class="container">
+    <div class="hardware-inner">
+
+      <div>
+        <div class="eyebrow" data-pg-key="hw.eyebrow">PawGate Hardware</div>
+        <h2 class="section-title" style="margin-top:12px" data-pg-key="hw.title">Bygd for å vare</h2>
+        <p style="font-size:15px;color:var(--muted2);margin:16px 0 32px;line-height:1.65;font-weight:300;" data-pg-key="hw.body">
+          Alt aluminium, pulverlakkert matt svart. Kassett-systemet gjør det mulig å bytte hver enhet på under fem minutter — uten verktøy, uten fagfolk.
+        </p>
+        <ul class="hw-list">
+          <li class="hw-item"><div class="hw-dot" style="background:#b89a5a"></div><div><div class="hw-name">Kassettramme</div><div class="hw-spec">Alum. 5052 · 3mm gods · RAL 9005 matt svart</div></div></li>
+          <li class="hw-item"><div class="hw-dot" style="background:#9aa8b0"></div><div><div class="hw-name">Lukeplate</div><div class="hw-spec">Alum. 4mm · Hard-anodiserte skinner · EPDM-tetning</div></div></li>
+          <li class="hw-item"><div class="hw-dot" style="background:#7aaa5a"></div><div><div class="hw-name">DC gearmotor + tannreim</div><div class="hw-spec">12V · 30RPM · 50Ncm · GT2-reim</div></div></li>
+          <li class="hw-item"><div class="hw-dot" style="background:#5878b8"></div><div><div class="hw-name">ESP32-S3 kontroller</div><div class="hw-spec">WiFi + BLE · IP65 motorhus · Hall-sensorer</div></div></li>
+        </ul>
+      </div>
+
+      <div class="hardware-visual" data-pg-key="hw.visual" data-pg-type="image">
+        <div class="door-sketch">
+          <div class="door-motor-box">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#b89a5a;letter-spacing:1px">MOTORHUS</div>
+            <div class="door-motor-vents">
+              <div class="vent"></div><div class="vent"></div><div class="vent"></div>
+              <div class="vent"></div><div class="vent"></div><div class="vent"></div>
+              <div class="vent"></div><div class="vent"></div>
+            </div>
+          </div>
+          <div class="door-frame">
+            <div class="door-rail-l"></div>
+            <div class="door-rail-r"></div>
+            <div class="door-belt"></div>
+            <div class="door-plate">
+              <div class="door-paw">🐾</div>
+            </div>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);margin-top:10px;text-align:center;letter-spacing:1px">
+            380 × 520 mm opning
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING ── -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-header" style="text-align:center">
+      <div class="eyebrow" data-pg-key="price.eyebrow">Priser</div>
+      <h2 class="section-title" data-pg-key="price.title">Enkle, transparente priser</h2>
+    </div>
+    <div class="pricing-grid">
+
+      <div class="price-card">
+        <div class="price-tier">App</div>
+        <div class="price-name">PawGate Basis</div>
+        <div class="price-desc">For deg som vil prøve appen med eget utstyr og kamera.</div>
+        <div class="price-amount">Gratis</div>
+        <div class="price-period">Prøv uten kredittkort</div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Inntil 3 binger</li>
+          <li><span class="check">✓</span> Manuell styring</li>
+          <li><span class="check">✓</span> 1 bruker</li>
+          <li><span class="check">✓</span> Grunnleggende kameravisning</li>
+        </ul>
+        <button class="btn btn-outline" onclick="openDownloadModal()" style="width:100%;justify-content:center">Last ned</button>
+      </div>
+
+      <div class="price-card featured">
+        <div class="featured-badge">MEST POPULÆR</div>
+        <div class="price-tier">App + SaaS</div>
+        <div class="price-name">PawGate Pro</div>
+        <div class="price-desc">Full kontroll for det seriøse kennelet med flere binger og ansatte.</div>
+        <div class="price-amount">399 kr</div>
+        <div class="price-period">per mnd · ingen binding</div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Ubegrenset binger</li>
+          <li><span class="check">✓</span> Automatiske timere</li>
+          <li><span class="check">✓</span> Opptil 10 brukere</li>
+          <li><span class="check">✓</span> Smarte varsler</li>
+          <li><span class="check">✓</span> Historikk og logg</li>
+          <li><span class="check">✓</span> Kalender og oppgaver</li>
+        </ul>
+        <button class="btn btn-primary" onclick="openDownloadModal()" style="width:100%;justify-content:center">Kom i gang</button>
+      </div>
+
+      <div class="price-card coming-soon-card" style="position:relative">
+        <div class="coming-soon-top">KOMMER SNART</div>
+        <div class="price-tier">App + Hardware</div>
+        <div class="price-name">PawGate Complete</div>
+        <div class="price-desc">Alt inkludert — app og PawGate eget hardware installert hos deg.</div>
+        <div class="price-amount">fra 15 000 kr</div>
+        <div class="price-period">engangsbeløp + 399 kr/mnd</div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Alt i Pro</li>
+          <li><span class="check">✓</span> PawGate kassett per binge</li>
+          <li><span class="check">✓</span> Profesjonell installasjon</li>
+          <li><span class="check">✓</span> PawGate kamera</li>
+          <li><span class="check">✓</span> Prioritert support</li>
+        </ul>
+        <a href="mailto:hei@pawgate.no" class="btn btn-ghost" style="width:100%;justify-content:center">Ta kontakt</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── DOWNLOAD SECTION ── -->
+<section id="download" class="download-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="eyebrow">Last ned</div>
+      <h2 class="section-title">Hent PawGate</h2>
+    </div>
+
+    <div class="download-inner">
+
+      <!-- App downloads -->
+      <div class="download-box">
+        <div class="download-box-header">
+          <div class="download-box-icon">
+            <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg>
+          </div>
+          <div>
+            <div class="download-box-title">Mobilapp</div>
+            <div class="download-box-sub">iOS og Android</div>
+          </div>
+        </div>
+        <div class="download-list">
+          <div class="download-item">
+            <div class="download-item-left">
+              <div class="download-type">iOS<br>App</div>
+              <div>
+                <div class="download-name">PawGate for iPhone</div>
+                <div class="download-meta">iOS 16+ · iPhone · iPad</div>
+              </div>
+            </div>
+            <div class="coming-soon-badge">Kommer snart</div>
+          </div>
+          <div class="download-item">
+            <div class="download-item-left">
+              <div class="download-type">And<br>roid</div>
+              <div>
+                <div class="download-name">PawGate for Android</div>
+                <div class="download-meta">Android 10+ · Google Play</div>
+              </div>
+            </div>
+            <div class="coming-soon-badge">Kommer snart</div>
+          </div>
+          <div class="download-item">
+            <div class="download-item-left">
+              <div class="download-type">Pro<br>to</div>
+              <div>
+                <div class="download-name">Interaktiv prototype</div>
+                <div class="download-meta">HTML · Ver. 0.9 beta · 178 KB</div>
+              </div>
+            </div>
+            <button class="download-btn" onclick="openDownloadModal()">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Last ned
+            </button>
+          </div>
+        </div>
+        <div class="upload-note">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Apper for iOS og Android er under utvikling og kommer snart.
+        </div>
+      </div>
+
+      <!-- Documents & firmware -->
+      <div class="download-box">
+        <div class="download-box-header">
+          <div class="download-box-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="download-box-title">Dokument og firmware</div>
+            <div class="download-box-sub">For installasjon og utvikling</div>
+          </div>
+        </div>
+        <div class="download-list">
+          <div class="download-item">
+            <div class="download-item-left">
+              <div class="download-type">ESP<br>FW</div>
+              <div>
+                <div class="download-name">ESP32 Firmware</div>
+                <div class="download-meta">Ver. 1.0.0 · .bin · Kommer snart</div>
+              </div>
+            </div>
+            <div class="coming-soon-badge">Kommer snart</div>
+          </div>
+          <div class="download-item">
+            <div class="download-item-left">
+              <div class="download-type">BOM<br>PDF</div>
+              <div>
+                <div class="download-name">Stykkliste (BOM)</div>
+                <div class="download-meta">Hardware per binge · PDF</div>
+              </div>
+            </div>
+            <div class="coming-soon-badge">Kommer snart</div>
+          </div>
+          <div class="download-item">
+            <div class="download-item-left">
+              <div class="download-type">SKI<br>SSE</div>
+              <div>
+                <div class="download-name">Teknisk skisse kassett</div>
+                <div class="download-meta">HTML · Interaktiv · 26 KB</div>
+              </div>
+            </div>
+            <button class="download-btn" onclick="openDownloadModal()">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Last ned
+            </button>
+          </div>
+        </div>
+        <div class="upload-note">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Fleire nedlastingar vert lagt til etter kvart som produktet utviklar seg.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo"><div class="nav-logo-dot"></div>PAWGATE</div>
+        <p class="footer-desc">Smart kennelstyring for seriøse kenneleiere. Fra Norge, bygd for norske forhold.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Produkt</div>
+        <ul class="footer-links">
+          <li><a href="#features">Funksjoner</a></li>
+          <li><a href="#hardware">Hardware</a></li>
+          <li><a href="#pricing">Prisar</a></li>
+          <li><a href="#download">Last ned</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Selskap</div>
+        <ul class="footer-links">
+          <li><a href="#">Om oss</a></li>
+          <li><a href="#">Kontakt</a></li>
+          <li><a href="#">Partnerprogram</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Support</div>
+        <ul class="footer-links">
+          <li><a href="#">Installasjonsveiledning</a></li>
+          <li><a href="#">Vanlige spørsmål</a></li>
+          <li><a href="mailto:hei@pawgate.no">hei@pawgate.no</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 PawGate · Alle rettigheter forbeholdt</span>
+      <span>Made in Norway 🇳🇴</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ AUTH OVERLAY ══ -->
+<div class="overlay" id="auth-ov">
+ <div class="omodal">
+  <div class="mhdr">
+   <div><div class="mtitle">Logg inn</div><div class="msub">Velkommen til PawGate</div></div>
+   <button class="mclose" onclick="closeOv('auth-ov')">✕</button>
+  </div>
+  <div class="mbody">
+   <div class="auth-tabs">
+    <div class="auth-tab active" id="t-login" onclick="swTab('login')">Logg inn</div>
+    <div class="auth-tab" id="t-reg" onclick="swTab('reg')">Registrer deg</div>
+   </div>
+   <!-- Login -->
+   <div class="auth-panel active" id="p-login">
+    <div class="field"><label>E-post</label><input type="email" class="inp" id="l-email" placeholder="din@epost.no"></div>
+    <div class="field"><label>Passord</label><input type="password" class="inp" id="l-pass" placeholder="••••••••"></div>
+    <button class="btn btn-primary" onclick="doLogin()" style="width:100%;justify-content:center">Logg inn</button>
+    <div class="auth-note">Ingen konto? <span class="auth-link" onclick="swTab('reg')">Registrer deg</span></div>
+    <div class="auth-note"><span class="auth-link" style="color:var(--muted)" onclick="swTab('forgot')">Glemt passord?</span></div>
+   </div>
+   <!-- Forgot password -->
+   <div class="auth-panel" id="p-forgot">
+    <div class="field"><label>E-post</label><input type="email" class="inp" id="f-email" placeholder="din@epost.no"></div>
+    <button class="btn btn-primary" onclick="doForgot()" style="width:100%;justify-content:center">Send tilbakestillingslenke</button>
+    <div class="auth-note"><span class="auth-link" style="color:var(--muted)" onclick="swTab('login')">← Tilbake</span></div>
+   </div>
+   <!-- Register -->
+   <div class="auth-panel" id="p-reg">
+    <div class="field"><label>Navn</label><input type="text" class="inp" id="r-name" placeholder="Ditt fulle navn"></div>
+    <div class="field"><label>E-post</label><input type="email" class="inp" id="r-email" placeholder="din@epost.no"></div>
+    <div class="field"><label>Passord</label><input type="password" class="inp" id="r-pass" placeholder="Minst 8 tegn"></div>
+    <div class="nl-box">
+     <div class="nl-title">Hold deg oppdatert</div>
+     <div class="nl-desc">Få beskjed når appen lanseres, ny hardware er tilgjengelig og andre nyheter fra PawGate.</div>
+     <label class="cb-row"><input type="checkbox" checked id="r-nl"><span>Ja, send meg nyheter fra PawGate</span></label>
+     <label class="cb-row"><input type="checkbox" id="r-launch"><span>Varsle meg spesielt når appen er klar for nedlasting</span></label>
+    </div>
+    <button class="btn btn-primary" onclick="doReg()" style="width:100%;justify-content:center">Opprett konto</button>
+    <div class="auth-note">Har du konto? <span class="auth-link" onclick="swTab('login')">Logg inn</span></div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- ══ PROFILE OVERLAY ══ -->
+<div class="overlay" id="profile-ov">
+ <div class="omodal" style="max-width:460px">
+  <div class="mhdr">
+   <div style="display:flex;align-items:center;gap:14px">
+    <div class="profile-avatar-big" id="profile-av-big"></div>
+    <div><div class="mtitle" id="profile-title">Min profil</div><div class="msub" id="profile-email-sub"></div></div>
+   </div>
+   <button class="mclose" onclick="closeOv('profile-ov')">✕</button>
+  </div>
+  <div class="mbody" style="max-height:72vh;overflow-y:auto;gap:0;padding:20px 28px 28px">
+
+   <div class="profile-section-lbl">Personalia</div>
+   <div class="field" style="margin-bottom:12px"><label>Fullt navn</label><input type="text" class="inp" id="p-name" placeholder="Ditt fulle navn"></div>
+   <div class="field" style="margin-bottom:12px"><label>Sted / by</label><input type="text" class="inp" id="p-location" placeholder="f.eks. Bergen"></div>
+   <div class="field" style="margin-bottom:16px"><label>Telefonnummer</label><input type="tel" class="inp" id="p-phone" placeholder="+47 000 00 000"></div>
+   <button class="btn btn-primary" onclick="saveProfile()" style="width:100%;justify-content:center;margin-bottom:24px">Lagre endringer</button>
+
+   <div class="profile-divider"></div>
+   <div class="profile-section-lbl">Endre e-post</div>
+   <div class="field" style="margin-bottom:16px"><label>Ny e-post</label><input type="email" class="inp" id="p-email" placeholder="ny@epost.no"></div>
+   <button class="btn btn-ghost" onclick="updateProfileEmail()" style="width:100%;justify-content:center;margin-bottom:24px">Oppdater e-post</button>
+
+   <div class="profile-divider"></div>
+   <div class="profile-section-lbl">Endre passord</div>
+   <div class="field" style="margin-bottom:12px"><label>Nytt passord</label><input type="password" class="inp" id="p-pass" placeholder="Minst 8 tegn"></div>
+   <div class="field" style="margin-bottom:16px"><label>Bekreft passord</label><input type="password" class="inp" id="p-pass2" placeholder="Gjenta passordet"></div>
+   <button class="btn btn-ghost" onclick="updateProfilePassword()" style="width:100%;justify-content:center;margin-bottom:24px">Oppdater passord</button>
+
+   <div class="profile-divider" id="admin-divider" style="display:none"></div>
+   <button class="btn btn-ghost" id="profile-admin-btn" onclick="closeOv('profile-ov');openAdmin()" style="display:none;width:100%;justify-content:center;gap:8px;margin-bottom:12px">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Admin-panel
+   </button>
+   <div class="profile-divider"></div>
+   <button class="btn" onclick="doLogout()" style="width:100%;justify-content:center;background:rgba(184,90,74,.08);border:1px solid rgba(184,90,74,.25);color:#e07060">Logg ut</button>
+  </div>
+ </div>
+</div>
+
+<!-- ══ PASSWORD RESET OVERLAY ══ -->
+<div class="overlay" id="reset-ov">
+ <div class="omodal" style="max-width:420px">
+  <div class="mhdr">
+   <div><div class="mtitle">Nytt passord</div><div class="msub">Skriv inn ditt nye passord</div></div>
+  </div>
+  <div class="mbody" style="display:flex;flex-direction:column;gap:14px">
+   <div class="field"><label>Nytt passord</label><input type="password" class="inp" id="rp-pass" placeholder="Minst 8 tegn"></div>
+   <div class="field"><label>Bekreft passord</label><input type="password" class="inp" id="rp-pass2" placeholder="Gjenta passordet"></div>
+   <button class="btn btn-primary" onclick="doResetPassword()" style="width:100%;justify-content:center">Lagre nytt passord</button>
+  </div>
+ </div>
+</div>
+
+<!-- ══ SUCCESS OVERLAY ══ -->
+<div class="overlay" id="ok-ov">
+ <div class="omodal" style="max-width:380px">
+  <div class="mbody" style="text-align:center;padding:40px 28px">
+   <div style="font-size:48px;margin-bottom:16px" id="ok-icon">🎉</div>
+   <div style="font-size:20px;font-weight:700;margin-bottom:8px" id="ok-title">Registrert!</div>
+   <div style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px" id="ok-body">Vi sender deg en e-post når det er noe nytt.</div>
+   <button class="btn btn-primary" onclick="closeOv('ok-ov')" style="width:100%;justify-content:center">Lukk</button>
+  </div>
+ </div>
+</div>
+
+<!-- ══ DOWNLOAD OVERLAY ══ -->
+<div class="overlay" id="dl-ov">
+ <div class="omodal" style="max-width:500px">
+  <div class="mhdr">
+   <div><div class="mtitle">Last ned PawGate</div><div class="msub">Velg hva du vil laste ned</div></div>
+   <button class="mclose" onclick="closeOv('dl-ov')">✕</button>
+  </div>
+  <div class="mbody" id="dl-list" style="max-height:72vh;overflow-y:auto"></div>
+ </div>
+</div>
+
+<!-- ══ ADMIN SHELL ══ -->
+<div class="admin-shell" id="admin-shell">
+ <div class="atopbar">
+  <div style="display:flex;align-items:center;gap:12px">
+   <div class="alogo"><div class="nav-logo-dot"></div>PAWGATE</div>
+   <span style="font-size:10px;color:var(--accent);font-family:'IBM Plex Mono',monospace;padding:2px 8px;background:var(--accent-bg);border-radius:5px;border:1px solid rgba(184,154,90,.25);letter-spacing:.08em">ADMIN</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+   <a href="https://pawgate.no?edit=1" target="_blank" class="btn btn-primary" style="padding:7px 14px;font-size:12px;text-decoration:none;display:flex;align-items:center;gap:6px">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Rediger visuelt
+   </a>
+   <a href="https://pawgate.no" target="_blank" class="btn btn-ghost" style="padding:7px 14px;font-size:12px;text-decoration:none;display:flex;align-items:center;gap:6px">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    Forhåndsvis
+   </a>
+   <span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;border-left:1px solid var(--border);padding-left:10px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="a-user-lbl"></span>
+   <button class="btn btn-ghost" style="padding:7px 14px;font-size:12px" onclick="closeAdmin()">← Tilbake</button>
+  </div>
+ </div>
+ <div class="abody">
+  <!-- Sidebar -->
+  <div class="asidebar">
+   <div class="asec">Oversikt</div>
+   <div class="anav on" onclick="showAP('dash',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Dashboard</span></div>
+   <div class="asec">Innhold</div>
+   <div class="anav" onclick="showAP('hero',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span>Hero</span></div>
+   <div class="anav" onclick="showAP('feat',this)"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Funksjoner</span></div>
+   <div class="anav" onclick="showAP('hw',this)"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg><span>Hardware</span></div>
+   <div class="anav" onclick="showAP('price',this)"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/></svg><span>Priser</span></div>
+   <div class="asec">Nedlastinger</div>
+   <div class="anav" onclick="showAP('files',this)"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Filer og lenker</span></div>
+   <div class="asec">Brukere</div>
+   <div class="anav" onclick="showAP('users',this)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Brukere</span></div>
+   <div class="anav" onclick="showAP('nl',this)"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>Nyhetsbrev</span></div>
+   <div class="asec">System</div>
+   <div class="anav" onclick="showAP('cfg',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Innstillinger</span></div>
+   <div class="asec">Tilgang</div>
+   <div class="anav" onclick="showAP('admins',this)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Administratorer</span></div>
+  </div>
+  <!-- Pages -->
+  <div class="acontent">
+   <!-- DASHBOARD -->
+   <div class="apage on" id="ap-dash">
+    <div class="aptitle">Dashboard</div><div class="apsub">Oversikt</div>
+    <div class="acard" style="margin-bottom:20px;background:var(--accent-bg);border-color:rgba(184,154,90,.3)">
+     <div class="acard-body" style="display:flex;align-items:center;justify-content:space-between;gap:20px">
+      <div>
+       <div style="font-size:15px;font-weight:700;margin-bottom:4px">Visuell side-editor</div>
+       <div style="font-size:12px;color:var(--muted);line-height:1.5">Klikk og rediger tekst direkte på nettsiden — som WordPress. Endringer lagres i databasen og vises umiddelbart.</div>
+      </div>
+      <a href="https://pawgate.no?edit=1" target="_blank" class="btn btn-primary" style="text-decoration:none;display:flex;align-items:center;gap:8px;flex-shrink:0;padding:10px 20px">
+       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+       Åpne editor
+      </a>
+     </div>
+    </div>
+    <div class="stats4">
+     <div class="scard"><div class="scard-n" id="sn-users">0</div><div class="scard-l">Registrerte brukere</div></div>
+     <div class="scard"><div class="scard-n" id="sn-nl">0</div><div class="scard-l">Nyhetsbrev</div></div>
+     <div class="scard"><div class="scard-n" id="sn-files">0</div><div class="scard-l">Tilgjengelige filer</div></div>
+     <div class="scard"><div class="scard-n">v0.9</div><div class="scard-l">App-versjon</div></div>
+    </div>
+    <div class="acard"><div class="acard-hdr"><div class="acard-title">Siste registreringer</div></div><table class="atable"><thead><tr><th>Navn</th><th>E-post</th><th>Dato</th><th>Nyhetsbrev</th></tr></thead><tbody id="dash-users"></tbody></table></div>
+   </div>
+   <!-- HERO -->
+   <div class="apage" id="ap-hero">
+    <div class="aptitle">Hero-seksjon</div><div class="apsub">Rediger øverste del av forsiden</div>
+    <div class="acard"><div class="acard-hdr"><div class="acard-title">Tekst</div><button class="btn btn-primary" style="padding:7px 16px;font-size:12px" onclick="saveHero()">Lagre</button></div>
+    <div class="acard-body" style="display:flex;flex-direction:column;gap:14px">
+     <div class="field"><label>Merkelapp (liten tekst over tittel)</label><input type="text" class="inp" id="h-eye" value="Smart kennelstyring"></div>
+     <div class="arow">
+      <div class="field"><label>Tittel linje 1</label><input type="text" class="inp" id="h-t1" value="Kontroll over"></div>
+      <div class="field"><label>Tittel linje 2 (gull farge)</label><input type="text" class="inp" id="h-t2" value="kennelen din"></div>
+     </div>
+     <div class="field"><label>Tittel linje 3</label><input type="text" class="inp" id="h-t3" value="fra telefonen"></div>
+     <div class="field"><label>Brødtekst</label><textarea class="inp" id="h-body">PawGate gir deg full oversikt og styring — hundeluker, spyling, kamera og oppgaver — alt i én app. Designet for seriøse kenneleiere.</textarea></div>
+    </div></div>
+   </div>
+   <!-- FEATURES -->
+   <div class="apage" id="ap-feat">
+    <div class="aptitle">Funksjoner</div><div class="apsub">Rediger de seks funksjonskortene</div>
+    <div id="feat-admin"></div>
+   </div>
+   <!-- HARDWARE -->
+   <div class="apage" id="ap-hw">
+    <div class="aptitle">Hardware-seksjon</div><div class="apsub">Rediger tekst og bilde for hardware-seksjonen</div>
+    <div class="acard"><div class="acard-hdr"><div class="acard-title">Innhold</div><button class="btn btn-primary" style="padding:7px 16px;font-size:12px" onclick="saveHW()">Lagre</button></div>
+    <div class="acard-body" style="display:flex;flex-direction:column;gap:14px">
+     <div class="field"><label>Tittel</label><input type="text" class="inp" id="hw-t" value="Bygd for å vare"></div>
+     <div class="field"><label>Beskrivelse</label><textarea class="inp" id="hw-d">Alt aluminium, pulverlakkert matt svart. Kassett-systemet gjør det mulig å bytte hver enhet på under fem minutter — uten verktøy, uten fagfolk.</textarea></div>
+     <div class="field"><label>Bilde-URL (lim inn lenke til bilde)</label><input type="text" class="inp" id="hw-img" placeholder="https://..."></div>
+     <div class="filedrop" onclick="document.getElementById('hw-file').click()">
+      <div style="font-size:28px;margin-bottom:6px;opacity:.4">🖼️</div>
+      <div style="font-size:13px;color:var(--muted)">Klikk for å laste opp bilde</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:monospace">PNG · JPG · WebP · Maks 5MB</div>
+     </div>
+     <input type="file" id="hw-file" style="display:none" accept="image/*" onchange="prevHWImg(this)">
+     <div id="hw-prev" style="display:none"><img id="hw-prev-img" style="max-width:100%;border-radius:12px;border:1px solid var(--border)"></div>
+    </div></div>
+   </div>
+   <!-- PRISER -->
+   <div class="apage" id="ap-price">
+    <div class="aptitle">Priser</div><div class="apsub">Rediger prisplaner</div>
+    <div id="price-admin" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px"></div>
+   </div>
+   <!-- FILES -->
+   <div class="apage" id="ap-files">
+    <div class="aptitle">Filer og nedlastinger</div><div class="apsub">Legg til nedlastingslenker som vises på nettsiden og i nedlastingsmodalen</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+     <button class="btn btn-primary" onclick="showAddFile()">+ Legg til fil</button>
+    </div>
+    <div class="acard" id="add-file-card" style="display:none;margin-bottom:20px">
+     <div class="acard-hdr"><div class="acard-title">Ny fil</div></div>
+     <div class="acard-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="arow">
+       <div class="field"><label>Navn</label><input type="text" class="inp" id="nf-name" placeholder="f.eks. PawGate iOS app"></div>
+       <div class="field"><label>Type-etikett (maks 6 tegn)</label><input type="text" class="inp" id="nf-type" placeholder="iOS" maxlength="6"></div>
+      </div>
+      <div class="arow">
+       <div class="field"><label>Kategori</label><select class="inp" id="nf-cat"><option value="app">Mobilapp</option><option value="doc">Dokumenter</option></select></div>
+       <div class="field"><label>Status</label><select class="inp" id="nf-status"><option value="available">Tilgjengelig (med lenke)</option><option value="coming">Kommer snart</option></select></div>
+      </div>
+      <div class="field"><label>Nedlastingslenke / filnavn</label><input type="text" class="inp" id="nf-url" placeholder="https://... eller filnavn.html"></div>
+      <div class="field"><label>Metadata (vises under navnet)</label><input type="text" class="inp" id="nf-meta" placeholder="f.eks. iOS 16+ · App Store"></div>
+      <div style="display:flex;gap:8px"><button class="btn btn-primary" onclick="addFile()">Legg til</button><button class="btn btn-ghost" onclick="document.getElementById('add-file-card').style.display='none'">Avbryt</button></div>
+     </div>
+    </div>
+    <div class="acard"><div class="acard-hdr"><div class="acard-title">Alle filer</div></div><table class="atable"><thead><tr><th>Navn</th><th>Kategori</th><th>Lenke</th><th>Status</th><th></th></tr></thead><tbody id="files-tbody"></tbody></table></div>
+   </div>
+   <!-- USERS -->
+   <div class="apage" id="ap-users">
+    <div class="aptitle">Brukere</div><div class="apsub" id="users-sub">0 registrerte</div>
+    <div class="acard"><div class="acard-hdr"><div class="acard-title">Alle brukere</div></div><table class="atable"><thead><tr><th>Navn</th><th>E-post</th><th>Dato</th><th>Nyhetsbrev</th><th>Lansering</th></tr></thead><tbody id="users-tbody"></tbody></table></div>
+   </div>
+   <!-- NYHETSBREV -->
+   <div class="apage" id="ap-nl">
+    <div class="aptitle">Nyhetsbrev</div><div class="apsub">Send til abonnenter</div>
+    <div class="acard"><div class="acard-hdr"><div class="acard-title">Send melding</div></div><div class="acard-body" style="display:flex;flex-direction:column;gap:12px">
+     <div class="field"><label>Emne</label><input type="text" class="inp" id="nl-subj" placeholder="f.eks. PawGate-appen er nå klar!"></div>
+     <div class="field"><label>Mottakere</label><select class="inp" id="nl-filter"><option value="all">Alle nyhetsbrev-abonnenter</option><option value="launch">Kun lanserings-varsler</option></select></div>
+     <div class="field"><label>Melding</label><textarea class="inp" id="nl-msg" style="min-height:120px" placeholder="Skriv din melding her...&#10;&#10;Du kan bruke linjeskift for avsnitt."></textarea></div>
+     <div style="display:flex;gap:8px"><button class="btn btn-primary" id="nl-send-btn" onclick="sendNewsletter()">Send</button><button class="btn btn-ghost" onclick="previewNewsletter()">Forhåndsvisning</button></div>
+    </div></div>
+    <div class="acard"><div class="acard-hdr"><div class="acard-title">Abonnenter (<span id="nl-n">0</span>)</div></div><table class="atable"><thead><tr><th>E-post</th><th>Lansering</th><th>Dato</th></tr></thead><tbody id="nl-tbody"></tbody></table></div>
+   </div>
+   <!-- CONFIG -->
+   <div class="apage" id="ap-cfg">
+    <div class="aptitle">Innstillinger</div><div class="apsub">Globale innstillinger for nettsiden</div>
+    <div class="acard"><div class="acard-hdr"><div class="acard-title">Generelt</div><button class="btn btn-primary" style="padding:7px 16px;font-size:12px" onclick="alert('Lagret!')">Lagre</button></div>
+    <div class="acard-body" style="display:flex;flex-direction:column;gap:12px">
+     <div class="field"><label>Nettstedsnavn</label><input type="text" class="inp" value="PawGate"></div>
+     <div class="field"><label>Kontakt e-post</label><input type="text" class="inp" value="hei@pawgate.no"></div>
+     <div class="field"><label>Tagline</label><input type="text" class="inp" value="Smart kennelstyring for seriøse kenneleiere"></div>
+     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)">
+      <div><div style="font-size:13px;font-weight:600">Vedlikeholdsmodus</div><div style="font-size:12px;color:var(--muted)">Viser vedlikeholdsmelding til besøkende</div></div>
+      <div class="toggle" onclick="this.classList.toggle('on')"></div>
+     </div>
+     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)">
+      <div><div style="font-size:13px;font-weight:600">Registrering åpen</div><div style="font-size:12px;color:var(--muted)">Tillat nye brukere å registrere seg</div></div>
+      <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+     </div>
+    </div></div>
+   </div>
+   <!-- ADMINISTRATORER -->
+   <div class="apage" id="ap-admins">
+    <div class="aptitle">Administratorer</div><div class="apsub">Brukere med tilgang til admin-panelet</div>
+    <div class="acard" style="margin-bottom:20px">
+     <div class="acard-hdr"><div class="acard-title">Legg til administrator</div></div>
+     <div class="acard-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="arow" style="grid-template-columns:1fr auto;align-items:flex-end;gap:10px">
+       <div class="field"><label>E-postadresse</label><input type="email" class="inp" id="new-admin-email" placeholder="bruker@pawgate.no"></div>
+       <button class="btn btn-primary" onclick="addAdmin()" style="height:42px;padding:0 20px">Legg til</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+       <strong style="color:var(--muted2)">Merk:</strong> Brukeren trenger ikke ha en eksisterende konto — bare legg til e-posten. De vil automatisk se Admin-panel-knappen neste gang de logger inn.
+      </div>
+     </div>
+    </div>
+    <div class="acard">
+     <div class="acard-hdr"><div class="acard-title">Alle administratorer</div></div>
+     <table class="atable"><thead><tr><th>E-post</th><th>Lagt til</th><th></th></tr></thead><tbody id="admins-tbody"><tr><td colspan="3" style="color:var(--muted);text-align:center;padding:24px;font-size:13px">Laster...</td></tr></tbody></table>
+    </div>
+   </div>
+  </div><!-- /acontent -->
+ </div><!-- /abody -->
+</div><!-- /admin-shell -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
