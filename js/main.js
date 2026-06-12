@@ -460,6 +460,7 @@ function toggleTheme(){
       if(user){
         checkIsAdmin(user.email).then(isAdmin=>{ _isAdmin=isAdmin; updateProfileAdminBtn(); });
       }
+      if(event === 'INITIAL_SESSION') checkEditMode();
     }
     if(event === 'SIGNED_OUT'){
       updateNavAuth(null);
@@ -487,6 +488,144 @@ function updateNavBg(){
   }
 }
 window.addEventListener('scroll', updateNavBg);
+
+// ═══ Page content (load saved edits from Supabase on every page load) ═══
+async function initPageContent() {
+  try {
+    const { data, error } = await _sb.from('page_content').select('*');
+    if(error || !data || !data.length) return;
+    const map = {};
+    data.forEach(r => map[r.key] = r.value);
+    document.querySelectorAll('[data-pg-key]').forEach(el => {
+      if(map[el.dataset.pgKey] !== undefined) el.innerHTML = map[el.dataset.pgKey];
+    });
+    document.querySelectorAll('.feature-card').forEach((card, i) => {
+      const t = card.querySelector('.feature-title');
+      const b = card.querySelector('.feature-body');
+      if(t && map[`feat.${i}.title`] !== undefined) t.innerHTML = map[`feat.${i}.title`];
+      if(b && map[`feat.${i}.body`] !== undefined) b.innerHTML = map[`feat.${i}.body`];
+    });
+  } catch(e) { /* table may not exist yet */ }
+}
+
+// ═══ Visual editor (activated when URL has ?edit=1 and user is admin) ═══
+async function checkEditMode() {
+  if(!new URLSearchParams(window.location.search).has('edit')) return;
+  try {
+    const { data: { user } } = await _sb.auth.getUser();
+    if(!user) { alert('Du må logge inn for å bruke editoren.'); return; }
+    const isAdmin = await checkIsAdmin(user.email);
+    if(!isAdmin) return;
+    activateEditMode();
+  } catch(e) { }
+}
+
+function activateEditMode() {
+  document.body.insertAdjacentHTML('afterbegin',
+    `<div id="pg-edit-bar" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#b89a5a;color:#0c0b09;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;font-family:'IBM Plex Sans',sans-serif;box-shadow:0 2px 16px rgba(184,154,90,.35)">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.1em;display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          REDIGERINGSMODUS
+        </div>
+        <span style="font-size:11px;opacity:.65;font-weight:400">Klikk på tekst for å redigere</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="pg-save-status" style="font-size:11px;opacity:.65"></span>
+        <button id="pg-save-btn" style="padding:9px 22px;background:#0c0b09;color:#b89a5a;border:none;border-radius:9px;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer">Lagre endringer</button>
+        <a href="${window.location.pathname}" style="padding:9px 16px;background:rgba(0,0,0,.15);color:#0c0b09;border:none;border-radius:9px;font-size:12px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;text-decoration:none;display:flex;align-items:center;font-weight:600">Avslutt</a>
+      </div>
+    </div>`
+  );
+  document.body.style.paddingTop = '52px';
+
+  // Annotate feature cards (not in HTML to avoid repetition)
+  document.querySelectorAll('.feature-card').forEach((card, i) => {
+    const t = card.querySelector('.feature-title');
+    const b = card.querySelector('.feature-body');
+    if(t) t.dataset.pgKey = `feat.${i}.title`;
+    if(b) b.dataset.pgKey = `feat.${i}.body`;
+  });
+
+  // Make all annotated elements editable on click
+  document.querySelectorAll('[data-pg-key]').forEach(el => makeEditableEl(el));
+
+  document.getElementById('pg-save-btn').addEventListener('click', savePageContent);
+}
+
+function makeEditableEl(el) {
+  el.title = 'Klikk for å redigere';
+  el.style.cursor = 'text';
+  el.addEventListener('mouseenter', () => {
+    if(!el.isContentEditable) {
+      el.style.outline = '2px dashed rgba(184,154,90,.55)';
+      el.style.outlineOffset = '5px';
+      el.style.borderRadius = '3px';
+    }
+  });
+  el.addEventListener('mouseleave', () => {
+    if(!el.isContentEditable) el.style.outline = '';
+  });
+  el.addEventListener('click', e => {
+    if(!el.isContentEditable) {
+      // Deactivate any other active element
+      document.querySelectorAll('[contenteditable="true"]').forEach(a => {
+        a.contentEditable = 'false';
+        a.style.outline = '';
+        a.style.boxShadow = '';
+      });
+      el.contentEditable = 'true';
+      el.style.outline = '2px solid #b89a5a';
+      el.style.outlineOffset = '5px';
+      el.style.boxShadow = '0 0 0 5px rgba(184,154,90,.12)';
+      el.focus();
+      // Place cursor at end of text
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      if(sel) { sel.removeAllRanges(); sel.addRange(range); }
+    }
+    e.stopPropagation();
+  });
+  el.addEventListener('blur', () => {
+    el.contentEditable = 'false';
+    el.style.outline = '';
+    el.style.boxShadow = '';
+  });
+  el.addEventListener('keydown', e => { if(e.key === 'Escape') el.blur(); });
+}
+
+async function savePageContent() {
+  const btn = document.getElementById('pg-save-btn');
+  const status = document.getElementById('pg-save-status');
+  btn.textContent = 'Lagrer...';
+  btn.disabled = true;
+
+  // Close any open editor
+  document.querySelectorAll('[contenteditable="true"]').forEach(a => { a.contentEditable = 'false'; });
+
+  const updates = [];
+  document.querySelectorAll('[data-pg-key]').forEach(el => {
+    updates.push({ key: el.dataset.pgKey, value: el.innerHTML, updated_at: new Date().toISOString() });
+  });
+
+  const { error } = await _sb.from('page_content').upsert(updates, { onConflict: 'key' });
+
+  btn.disabled = false;
+  if(error) {
+    btn.textContent = 'Feil! Prøv igjen';
+    btn.style.background = '#b85a4a';
+    setTimeout(() => { btn.textContent = 'Lagre endringer'; btn.style.background = ''; }, 3000);
+  } else {
+    btn.textContent = 'Lagret ✓';
+    if(status) status.textContent = 'Sist lagret: ' + new Date().toLocaleTimeString('nb-NO');
+    setTimeout(() => { btn.textContent = 'Lagre endringer'; }, 2500);
+  }
+}
+
+// Load content and check edit mode on startup
+initPageContent();
 
 // ═══ Admin management ═══
 async function renderAdminsPage(){

@@ -746,15 +746,21 @@ footer {
 [data-theme="light"] .theme-toggle .icon-sun  { display: block; }
 [data-theme="light"] .theme-toggle .icon-moon { display: none; }
 
-/* Light mode: keep phone mockup dark (it's a product UI) */
-[data-theme="light"] .phone-outer  { background: #1a1814; border-color: #3a3630; }
-[data-theme="light"] .phone-screen { background: #1e1c18; }
-[data-theme="light"] .phone-notch  { background: #1a1814; border-color: #2a2620; }
-[data-theme="light"] .phone-nav    { background: #1a1814; border-color: #2a2620; }
-[data-theme="light"] .phone-pill   { background: #252220; border-color: #3a3630; }
-[data-theme="light"] .phone-binge  { background: #252220; border-color: #3a3630; }
-[data-theme="light"] .phone-cam    { background: #0c0c0a; border-color: #2a2620; }
-[data-theme="light"] .binge-btn    { background: #1e1c18; border-color: #3a3630; }
+/* Light mode: phone goes white/silver like a real iOS device */
+[data-theme="light"] .phone-outer      { background: #e2e2e8; border-color: #c0c0cc; box-shadow: 0 40px 100px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.04), inset 0 1px 0 rgba(255,255,255,.9); }
+[data-theme="light"] .phone-screen     { background: #f5f5f7; }
+[data-theme="light"] .phone-notch      { background: #e2e2e8; border-color: #d0d0d8; }
+[data-theme="light"] .phone-statusbar  { color: #333333; }
+[data-theme="light"] .phone-kennel     { color: #888888; }
+[data-theme="light"] .phone-pill       { background: #ffffff; border-color: #e0e0e6; }
+[data-theme="light"] .phone-pill-lbl   { color: #888888; }
+[data-theme="light"] .phone-binge      { background: #ffffff; border-color: #e8e8ec; }
+[data-theme="light"] .binge-dog        { color: #888888; }
+[data-theme="light"] .binge-btn        { background: #f5f5f7; border-color: #e0e0e6; color: #444444; }
+[data-theme="light"] .phone-cam        { background: #d0d0da; border-color: #c0c0cc; }
+[data-theme="light"] .phone-cam-grid   { background-image: linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.05) 1px, transparent 1px); background-size: 12px 12px; }
+[data-theme="light"] .phone-nav        { background: #f0f0f4; border-color: #e0e0e6; }
+[data-theme="light"] .phone-nav-item   { color: #888888; }
 
 /* Light mode: hardware diagram stays dark */
 [data-theme="light"] .door-motor-box { background: #1a1612; border-color: #3a3020; }
