@@ -1,5 +1,13 @@
+// ═══ Persistent storage helpers ═══
+function loadUsers() {
+  try { return JSON.parse(localStorage.getItem('pg_users') || '[]'); } catch(e) { return []; }
+}
+function saveUsers() {
+  try { localStorage.setItem('pg_users', JSON.stringify(users)); } catch(e) {}
+}
+
 // ═══ Data ═══
-let users = [];
+let users = loadUsers();
 let files = [
   {name:'Interaktiv prototype', type:'Proto', cat:'app', url:'kennel-app-prototype.html', meta:'HTML · v0.9 beta', status:'available'},
   {name:'3D-modell hundeluke',  type:'3D',    cat:'doc', url:'pawgate-door-3d.html',      meta:'HTML · Interaktiv', status:'available'},
@@ -10,7 +18,7 @@ let files = [
 ];
 let featData = [
   {title:'Automatiske hundeluker', body:'Sett timere for hver binge — luken åpner og lukker seg selv. Styr manuelt fra hvor som helst i verden.'},
-  {title:'Spyleskjema', body:'Automatisk spyling på faste tider. Se siste spyling og start manuelt på sekundet om noe kommer opp.'},
+  {title:'Automatisk spyling', body:'Automatisk spyling på faste tider. Se siste spyling og start manuelt på sekundet om noe kommer opp.'},
   {title:'Live kamera', body:'Se live-bilder fra alle binger direkte i appen. Støtter RTSP, ONVIF, WiFi og PawGate eget kamera.'},
   {title:'Flerbruker med roller', body:'Inviter ansatte med nøyaktig de tilgangene de skal ha. Eier, administrator, ansatt eller leser — eller lag egne roller.'},
   {title:'Smarte varsler', body:'Varsel hvis temperaturen er feil, spyling ikke er gjort, kamera mister signal, eller en luke ikke svarer.'},
@@ -52,6 +60,7 @@ function doReg(){
   const nl=document.getElementById('r-nl').checked;
   const launch=document.getElementById('r-launch').checked;
   users.push({name:n,email:e,date:new Date().toISOString().slice(0,10),nl,launch});
+  saveUsers();
   closeOv('auth-ov');
   showOk('Registrert!', nl?'Vi sender deg en e-post når det er noe nytt fra PawGate.':'Kontoen din er opprettet. Velkommen!', '🎉');
   updateStats();
@@ -60,7 +69,7 @@ function doReg(){
 function doAdminLogin(){
   const e=document.getElementById('a-email').value.trim();
   const p=document.getElementById('a-pass').value;
-  if(e==='admin@pawgate.no'&&p==='admin123'){ closeOv('auth-ov'); openAdmin(); }
+  if(e==='admin@pawgate.no'&&p==='PawG8!Admin#2026'){ closeOv('auth-ov'); openAdmin(); }
   else alert('Feil e-post eller passord');
 }
 
