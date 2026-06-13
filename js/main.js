@@ -4,6 +4,15 @@ const _sb = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16YWJwb21kb2JrZXVod2NqeXZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNTYzMzAsImV4cCI6MjA5NjgzMjMzMH0.bb4q28cVQiNfwIhEeqJpuJgP2Ro0FUdMe7AeSG-i0ak'
 );
 
+// ═══ Plan selection — writes to profiles so app syncs automatically ═══
+async function choosePlan(planId) {
+  const { data: { user } } = await _sb.auth.getUser();
+  if (!user) { openModal(); return; } // not logged in — open register modal
+  const planNames = {basis:'Basis · Gratis', pro:'Pro · 399 kr/mnd', complete:'Complete'};
+  await _sb.from('profiles').update({plan: planId, plan_status: 'active'}).eq('id', user.id);
+  alert(`Plan oppdatert til ${planNames[planId] || planId} ✓\nEndringa synkroniserast automatisk til appen.`);
+}
+
 // ═══ HTML escaping — always use this when writing user data into innerHTML ═══
 function esc(s) {
   return String(s)
