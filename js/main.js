@@ -84,7 +84,7 @@ function updateProfileAdminBtn() {
 // ═══ Data ═══
 let users = [];
 let files = [
-  {name:'PawGate for Windows',  type:'WIN',  cat:'desktop', url:'https://github.com/AdrianTheWizard/pawgate-app/releases/download/v1.0.7/PawGate-Setup-1.0.7.exe', meta:'Windows 10/11 · 64-bit · v1.0.7 · Oppdaterer seg selv automatisk', status:'available'},
+  {name:'PawGate for Windows',  type:'WIN',  cat:'desktop', url:'https://github.com/AdrianTheWizard/pawgate-app/releases/download/v1.0.8/PawGate-Setup-1.0.8.exe', meta:'Windows 10/11 · 64-bit · v1.0.8 · Oppdaterer seg selv automatisk', status:'available'},
   {name:'PawGate for iPhone',   type:'iOS',  cat:'mobil',   url:'', meta:'iOS 16+ · iPhone · iPad · App Store', status:'coming'},
   {name:'PawGate for Android',  type:'And.', cat:'mobil',   url:'', meta:'Android 10+ · Google Play', status:'coming'},
 ];
