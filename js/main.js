@@ -4,13 +4,29 @@ const _sb = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16YWJwb21kb2JrZXVod2NqeXZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNTYzMzAsImV4cCI6MjA5NjgzMjMzMH0.bb4q28cVQiNfwIhEeqJpuJgP2Ro0FUdMe7AeSG-i0ak'
 );
 
-// ═══ Plan selection — writes to profiles so app syncs automatically ═══
+// ═══ Plan selection — creates Stripe Checkout session ═══
 async function choosePlan(planId) {
-  const { data: { user } } = await _sb.auth.getUser();
-  if (!user) { openModal(); return; } // not logged in — open register modal
-  const planNames = {basis:'Basis · Gratis', pro:'Pro · 399 kr/mnd', complete:'Complete'};
-  await _sb.from('profiles').update({plan: planId, plan_status: 'active'}).eq('id', user.id);
-  alert(`Plan oppdatert til ${planNames[planId] || planId} ✓\nEndringa synkroniserast automatisk til appen.`);
+  if (planId === 'basis') {
+    // Free plan — just update directly
+    const { data: { user } } = await _sb.auth.getUser();
+    if (!user) { openModal(); return; }
+    await _sb.from('profiles').update({plan: 'basis', plan_status: 'active'}).eq('id', user.id);
+    alert('Plan sett til Basis (gratis) ✓');
+    return;
+  }
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { openModal(); return; }
+  const btn = event?.target;
+  if (btn) { btn.disabled = true; btn.textContent = 'Opnar betaling...'; }
+  const { data, error } = await _sb.functions.invoke('create-checkout', {
+    body: { plan: planId, success_url: location.origin + '?plan=success', cancel_url: location.href },
+  });
+  if (error || !data?.url) {
+    alert('Noko gjekk gale. Prøv igjen.');
+    if (btn) { btn.disabled = false; btn.textContent = planId === 'pro' ? 'Vel Pro' : 'Vel ' + planId; }
+    return;
+  }
+  location.href = data.url; // redirect to Stripe Checkout
 }
 
 // ═══ HTML escaping — always use this when writing user data into innerHTML ═══
