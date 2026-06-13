@@ -84,13 +84,9 @@ function updateProfileAdminBtn() {
 // ═══ Data ═══
 let users = [];
 let files = [
-  {name:'PawGate for Windows',  type:'Win',   cat:'app', url:'https://github.com/AdrianTheWizard/pawgate-app/releases/download/v1.0.0/PawGate.Setup.1.0.0.exe', meta:'Windows 10/11 · v1.0.0', status:'available'},
-  {name:'Interaktiv prototype', type:'Proto', cat:'app', url:'kennel-app-prototype.html', meta:'HTML · v0.9 beta', status:'available'},
-  {name:'3D-modell hundeluke',  type:'3D',    cat:'doc', url:'pawgate-door-3d.html',      meta:'HTML · Interaktiv', status:'available'},
-  {name:'Teknisk skisse',       type:'Skisse',cat:'doc', url:'pawgate-handskisse.html',   meta:'HTML · Handskisse', status:'available'},
-  {name:'PawGate for iPhone',   type:'iOS',   cat:'app', url:'',                          meta:'iOS 16+ · App Store', status:'coming'},
-  {name:'PawGate for Android',  type:'Andr.', cat:'app', url:'',                          meta:'Android 10+', status:'coming'},
-  {name:'ESP32 Firmware',       type:'ESP FW',cat:'doc', url:'',                          meta:'v1.0.0 · .bin', status:'coming'},
+  {name:'PawGate for Windows',  type:'WIN',  cat:'desktop', url:'https://github.com/AdrianTheWizard/pawgate-app/releases/download/v1.0.0/PawGate.Setup.1.0.0.exe', meta:'Windows 10/11 · 64-bit · v1.0.0 · Oppdaterer seg selv automatisk', status:'available'},
+  {name:'PawGate for iPhone',   type:'iOS',  cat:'mobil',   url:'', meta:'iOS 16+ · iPhone · iPad · App Store', status:'coming'},
+  {name:'PawGate for Android',  type:'And.', cat:'mobil',   url:'', meta:'Android 10+ · Google Play', status:'coming'},
 ];
 let featData = [
   {title:'Automatiske hundeluker', body:'Sett timere for hver binge — luken åpner og lukker seg selv. Styr manuelt fra hvor som helst i verden.'},
@@ -276,7 +272,7 @@ function showOk(title,body,icon='🎉'){
 function renderDLModal(){
   const c=document.getElementById('dl-list');
   const dlSvg='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
-  const cats=[{id:'app',lbl:'Mobilapp'},{id:'doc',lbl:'Dokumenter og skisser'}];
+  const cats=[{id:'desktop',lbl:'Desktop'},{id:'mobil',lbl:'Mobilapp — kommer snart'}];
   c.innerHTML='';
   cats.forEach(function(cat){
     var catFiles=files.filter(function(f){return f.cat===cat.id;});
